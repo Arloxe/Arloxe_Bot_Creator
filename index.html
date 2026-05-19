@@ -1,1 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <title>Arloxe Card Forge</title>
+
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/editor.css" />
+  <link rel="stylesheet" href="css/avatar.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <div data-partial="partials/index-header.html"></div>
+
+    <main class="main-content">
+      <section class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">Arloxe Card Forge</p>
+          <h2>Create Character Cards and Lorebooks without wrestling JSON demons.</h2>
+          <p>
+            A local-first browser tool for making Character Card V2 files,
+            PNG cards, and lorebooks for SillyTavern, Chub.AI, Botbooru,
+            and compatible platforms.
+          </p>
+        </div>
+
+        <div class="hero-badge hero-image-badge">
+        <img src="assets/main_icon.png" alt="Arloxe Card Forge icon" />
+        </div>
+      </section>
+
+      <section class="action-grid hub-grid" aria-label="Forge options">
+        <a class="action-card hub-card" href="editor.html#new-bot">
+          <span class="card-icon">🧍</span>
+          <h3>Create a New Bot</h3>
+          <p>Start with a clean Character Card V2 template.</p>
+        </a>
+
+        <a class="action-card hub-card" href="editor.html#edit-file">
+          <span class="card-icon">🛠️</span>
+          <h3>Edit Existing Card</h3>
+          <p>Import a JSON or PNG card and continue working.</p>
+        </a>
+
+        <a class="action-card hub-card" href="editor.html#new-bot-lorebook">
+          <span class="card-icon">🧬</span>
+          <h3>Bot + Lorebook</h3>
+          <p>Create a character with an embedded lorebook.</p>
+        </a>
+
+        <a class="action-card hub-card" href="editor.html#new-lorebook">
+          <span class="card-icon">📚</span>
+          <h3>Create Lorebook</h3>
+          <p>Build standalone lore entries and world info.</p>
+        </a>
+      </section>
+
+      <section class="panel readable-page hub-info">
+        <h2>Local-first by design</h2>
+        <p>
+          The forge runs in your browser. Imported cards, avatars, and drafts are handled
+          locally unless you choose to export and upload them somewhere yourself.
+        </p>
+
+        <h2>What can it export?</h2>
+        <p>
+          The editor currently supports Character Card V2 JSON and PNG cards with embedded
+          card metadata. Lorebook editing is being built into the same forge system.
+        </p>
+      </section>
+    </main>
+
+    <div data-partial="partials/footer.html"></div>
+  </div>
+
+  <script type="module" src="js/staticPage.js"></script>
+</body>
+</html>

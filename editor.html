@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Arloxe Card Forge</title>
+
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/editor.css" />
+  <link rel="stylesheet" href="css/avatar.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <div data-partial="partials/info-header.html"></div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div>
+          <h2>Forge Menu</h2>
+          <p>Choose what you want to make.</p>
+        </div>
+
+        <button class="icon-button close-menu" id="closeMenu" aria-label="Close menu">
+          ×
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-action active" type="button" data-action="new-bot">
+          <span class="nav-icon">🧍</span>
+          <span>
+            <strong>Create a New Bot</strong>
+            <small>Make a clean Character Card V2.</small>
+          </span>
+        </button>
+
+        <button class="nav-action" type="button" data-action="new-lorebook">
+          <span class="nav-icon">📚</span>
+          <span>
+            <strong>Create a New Lorebook</strong>
+            <small>Build a standalone lorebook/world info file.</small>
+          </span>
+        </button>
+
+        <button class="nav-action" type="button" data-action="new-bot-lorebook">
+          <span class="nav-icon">🧬</span>
+          <span>
+            <strong>Create Bot w/ Lorebook</strong>
+            <small>Make a card with an embedded lorebook.</small>
+          </span>
+        </button>
+
+        <button class="nav-action" type="button" data-action="edit-file">
+          <span class="nav-icon">🛠️</span>
+          <span>
+            <strong>Edit Existing File</strong>
+            <small>Import and auto-detect card/lorebook type.</small>
+          </span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p>Local-only by default. Your drafts stay in your browser.</p>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section class="editor-intro panel">
+  <div>
+    <p class="eyebrow">Editor Workspace</p>
+    <h2>What do you want to work on?</h2>
+    <p>
+      Create a new card, import an existing one, or start a bot with an embedded lorebook.
+    </p>
+  </div>
+
+  <a class="secondary-button inline-link-button" href="index.html">
+    Back to Hub
+  </a>
+</section>
+
+      <section class="action-grid" aria-label="Creation options">
+        <button class="action-card" type="button" data-action="new-bot">
+          <span class="card-icon">🧍</span>
+          <h3>Create a New Bot</h3>
+          <p>Start with a fresh Character Card V2 template.</p>
+        </button>
+
+        <button class="action-card" type="button" data-action="new-lorebook">
+          <span class="card-icon">📚</span>
+          <h3>Create a New Lorebook</h3>
+          <p>Make standalone lore entries, keywords, and world info.</p>
+        </button>
+
+        <button class="action-card" type="button" data-action="new-bot-lorebook">
+          <span class="card-icon">🧬</span>
+          <h3>Bot + Lorebook</h3>
+          <p>Create a character and connect lorebook entries side by side.</p>
+        </button>
+
+        <button class="action-card" type="button" data-action="edit-file">
+          <span class="card-icon">🛠️</span>
+          <h3>Edit Existing File</h3>
+          <p>Drop in a JSON or supported card file and let the forge inspect it.</p>
+        </button>
+      </section>
+
+      <section class="panel" id="editPanel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Import scanner</p>
+            <h2>Edit Existing File</h2>
+          </div>
+
+          <span class="status-pill" id="fileTypeStatus">No file loaded</span>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+          <input
+            type="file"
+            id="fileInput"
+            accept=".json,.png"
+            hidden
+          />
+
+          <div class="drop-zone-content">
+            <span class="drop-icon">⬆️</span>
+            <h3>Drop your file here</h3>
+            <p>
+              Or click to browse. The forge will try to detect whether it is
+              a bot, lorebook, or bot with lorebook.
+            </p>
+
+            <button class="primary-button" type="button" id="browseFileButton">
+              Choose File
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel workspace-panel" id="workspacePanel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Workspace</p>
+            <h2 id="workspaceTitle">Nothing open yet</h2>
+          </div>
+
+          <div class="panel-actions">
+            <button class="secondary-button" type="button" id="saveDraftButton">
+              Save Draft
+            </button>
+
+            <button class="primary-button" type="button" id="exportButton">
+              Export JSON
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+          <span>📝</span>
+          <h3>Your editor will appear here.</h3>
+          <p>
+            Pick a creation option or import a file to start shaping your character goblin.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <div data-partial="partials/footer.html"></div>
+
+    <button class="settings-button" id="settingsButton" type="button" aria-label="Open settings">
+      ⚙️
+    </button>
+
+    <aside class="settings-panel" id="settingsPanel" aria-hidden="true">
+      <div class="settings-header">
+        <div>
+          <h2>Settings</h2>
+          <p>Small knobs for future chaos.</p>
+        </div>
+
+        <button class="icon-button" id="closeSettings" type="button" aria-label="Close settings">
+          ×
+        </button>
+      </div>
+
+      <div class="settings-content">
+        <label class="setting-row">
+          <span>
+            <strong>Accent Style</strong>
+            <small>Muted green/gold for now.</small>
+          </span>
+
+          <select id="accentSelect">
+            <option value="forest-gold">Forest Gold</option>
+            <option value="deep-green">Deep Green</option>
+            <option value="soft-gold">Soft Gold</option>
+          </select>
+        </label>
+
+        <label class="setting-row">
+          <span>
+            <strong>Auto-save</strong>
+            <small>Stores drafts locally in this browser.</small>
+          </span>
+
+          <input type="checkbox" id="autosaveToggle" checked />
+        </label>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

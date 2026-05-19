@@ -1,0 +1,85 @@
+/* ================================
+   Simple Content Pages
+================================ */
+
+.simple-page-card {
+  margin-top: 2rem;
+}
+
+.readable-page {
+  max-width: 900px;
+  margin-inline: auto;
+  line-height: 1.75;
+}
+
+.readable-page h2 {
+  margin: 1.6rem 0 0.5rem;
+  color: var(--text);
+  letter-spacing: -0.03em;
+}
+
+.readable-page h2:first-child {
+  margin-top: 0;
+}
+
+.readable-page p {
+  margin: 0.55rem 0;
+  color: var(--text-muted);
+}
+
+.inline-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+  margin-top: 1rem;
+  text-decoration: none;
+}
+
+/* ================================
+   Hub Page
+================================ */
+
+.hub-grid {
+  margin-top: 1rem;
+}
+
+.hub-card {
+  display: block;
+  text-decoration: none;
+}
+
+.hub-info {
+  margin-top: 1rem;
+}
+
+/* ================================
+   Editor Intro
+================================ */
+
+.editor-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.editor-intro h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  letter-spacing: -0.04em;
+}
+
+.editor-intro p:last-child {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .editor-intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

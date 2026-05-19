@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>About | Arloxe Card Forge</title>
+
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/editor.css" />
+  <link rel="stylesheet" href="css/avatar.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <div data-partial="partials/app-header.html"></div>
+
+    <main class="main-content">
+      <section class="hero-card simple-page-card">
+        <div class="hero-copy">
+          <p class="eyebrow">About the forge</p>
+          <h2>A browser-based Character Card V2 and lorebook editor.</h2>
+          <p>
+            Arloxe Card Forge is a local-first tool for creating, editing, importing,
+            and exporting AI character cards and lorebooks.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel readable-page">
+        <h2>What it does</h2>
+        <p>
+          This tool helps creators build Character Card V2 files for use with platforms
+          and tools such as SillyTavern, Chub.AI, Botbooru, and compatible card systems.
+        </p>
+
+        <p>
+          The goal is to make character creation more comfortable without forcing creators
+          to hand-edit JSON files unless they want to.
+        </p>
+
+        <h2>Local-first by design</h2>
+        <p>
+          The editor is designed to run directly in your browser. Card data, avatars,
+          and drafts are handled locally unless the project is changed in the future to
+          add optional online features.
+        </p>
+
+        <h2>Compatibility</h2>
+        <p>
+          The forge aims to support Character Card V2 JSON and PNG cards with embedded
+          metadata. Some platforms may use extra fields or extensions, so compatibility
+          will improve over time.
+        </p>
+      </section>
+      <div data-partial="partials/footer.html"></div>
+    </main>
+
+  </div>
+
+ <script type="module" src="js/staticPage.js"></script>  
+
+</body>
+</html>
