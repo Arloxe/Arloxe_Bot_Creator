@@ -69,12 +69,20 @@
 
 @media (max-width: 760px) {
   .site-footer {
+    position: static;
     width: min(100% - 1rem, 1180px);
-    bottom: 0.75rem;
+    margin: 1rem auto 1.25rem;
+    padding: 0;
+    transform: none;
   }
 
   .footer-inner {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  body:has(textarea:focus) .site-footer,
+  body:has(input:focus) .site-footer {
+    display: none;
   }
 }
