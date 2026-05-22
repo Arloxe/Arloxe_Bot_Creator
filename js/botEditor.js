@@ -26,6 +26,8 @@ export function renderCardEditor(card, options = {}) {
   setCurrentProjectType("bot");
   setCurrentCard(card);
 
+  const depthPrompt = card.data.extensions?.depth_prompt || {};
+
   ensurePngExportButton();
 
   emptyState.style.display = "none";
@@ -200,11 +202,45 @@ export function renderCardEditor(card, options = {}) {
           </label>
         </div>
       </div>
+
+      <div class="editor-section">
+        <div class="section-title">
+          <span>📝</span>
+          <div>
+            <h3>Character's Note</h3>
+            <p>A depth-injected steering prompt. Inserted x messages deep into the chat history (x = depth), so it stays close to the model's attention. Stored in <code>extensions.depth_prompt</code> for SillyTavern/Chub. Leave the note empty to omit it from the card.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Note</span>
+            <textarea data-depth-field="prompt" rows="5" placeholder="# Notes&#10;- Key facts the model should always remember...">${escapeHtml(fieldValue(depthPrompt.prompt))}</textarea>
+          </label>
+        </div>
+
+        <div class="form-grid two-columns">
+          <label class="form-field">
+            <span>Depth</span>
+            <input type="number" data-depth-field="depth" min="0" value="${escapeHtml(depthPrompt.depth ?? 4)}" />
+          </label>
+
+          <label class="form-field">
+            <span>Role</span>
+            <select data-depth-field="role">
+              <option value="system" ${(depthPrompt.role || "system") === "system" ? "selected" : ""}>System</option>
+              <option value="user" ${depthPrompt.role === "user" ? "selected" : ""}>User</option>
+              <option value="assistant" ${depthPrompt.role === "assistant" ? "selected" : ""}>Assistant</option>
+            </select>
+          </label>
+        </div>
+      </div>
     </form>
   `;
 
   renderAlternateGreetings();
   wireCardEditorEvents();
+  wireDepthPromptEvents();
   wireAvatarEvents();
 }
 
@@ -330,6 +366,47 @@ function wireCardEditorEvents() {
     renderAlternateGreetings();
     saveDraftQuietly();
   });
+}
+
+function wireDepthPromptEvents() {
+  const form = document.getElementById("cardEditorForm");
+
+  form?.querySelectorAll("[data-depth-field]").forEach((input) => {
+    const handler = () => {
+      updateDepthPrompt();
+      saveDraftQuietly();
+    };
+
+    input.addEventListener("input", handler);
+    input.addEventListener("change", handler);
+  });
+}
+
+function updateDepthPrompt() {
+  if (!state.currentCard) return;
+
+  const form = document.getElementById("cardEditorForm");
+  if (!form) return;
+
+  const data = state.currentCard.data;
+  data.extensions = data.extensions || {};
+
+  const prompt = form.querySelector('[data-depth-field="prompt"]')?.value ?? "";
+  const depth = form.querySelector('[data-depth-field="depth"]')?.value ?? 4;
+  const role = form.querySelector('[data-depth-field="role"]')?.value || "system";
+
+  // An empty note means "no character note" — keep it out of the card
+  // entirely instead of writing a meaningless empty depth_prompt.
+  if (!prompt.trim()) {
+    delete data.extensions.depth_prompt;
+    return;
+  }
+
+  data.extensions.depth_prompt = {
+    prompt,
+    depth: Number(depth || 0),
+    role
+  };
 }
 
 function updateCardFromField(input) {
