@@ -183,7 +183,7 @@ function renderLorebookEntries() {
           </div>
 
           <button class="tiny-danger-button" type="button" data-remove-lorebook-entry="${index}">
-            Remove
+            Delete
           </button>
         </summary>
 
@@ -265,10 +265,12 @@ function wireEntryEvents() {
       event.stopPropagation();
 
       const index = Number(button.dataset.removeLorebookEntry);
+      const entry = state.currentLorebook.entries[index];
+      const entryTitle = entry?.name?.trim() || entry?.comment?.trim() || `Entry ${index + 1}`;
       const shouldRemove = await confirmAction({
-        title: "Remove lorebook entry?",
-        message: "This entry will be removed from the current lorebook.",
-        confirmLabel: "Remove"
+        title: "Delete lorebook entry?",
+        message: `"${entryTitle}" will be removed from the current lorebook.`,
+        confirmLabel: "Delete Entry"
       });
       if (!shouldRemove) return;
 
