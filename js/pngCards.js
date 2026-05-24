@@ -5,6 +5,7 @@ import {
   bytesToAscii,
   bytesToLatin1,
   computeCropRect,
+  getAvatarOutput,
   latin1ToBytes,
   loadImage,
   readUint32,
@@ -69,52 +70,53 @@ export async function createPngCardBlob() {
 
 async function createAvatarPngBlob() {
   const canvas = document.createElement("canvas");
-  const size = 512;
+  const output = getAvatarOutput(state.currentAvatarImageType);
 
-  canvas.width = size;
-  canvas.height = size;
+  canvas.width = output.width;
+  canvas.height = output.height;
 
   const ctx = canvas.getContext("2d");
 
   if (!state.currentAvatarDataUrl) {
-    drawPlaceholderAvatar(ctx, size);
+    drawPlaceholderAvatar(ctx, output.width, output.height);
     return canvasToBlob(canvas);
   }
 
   const image = await loadImage(state.currentAvatarDataUrl);
 
-  const { sx, sy, side } = computeCropRect(
+  const { sx, sy, sw, sh } = computeCropRect(
     image.width,
     image.height,
-    state.currentAvatarCrop
+    state.currentAvatarCrop,
+    state.currentAvatarImageType
   );
 
   ctx.drawImage(
     image,
     sx,
     sy,
-    side,
-    side,
+    sw,
+    sh,
     0,
     0,
-    size,
-    size
+    output.width,
+    output.height
   );
 
   return canvasToBlob(canvas);
 }
 
-function drawPlaceholderAvatar(ctx, size) {
-  const bg = ctx.createLinearGradient(0, 0, size, size);
+function drawPlaceholderAvatar(ctx, width, height) {
+  const bg = ctx.createLinearGradient(0, 0, width, height);
   bg.addColorStop(0, "#1a211a");
   bg.addColorStop(1, "#cba449");
 
   ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, size, size);
+  ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = "rgba(0, 0, 0, 0.32)";
   ctx.beginPath();
-  ctx.arc(size / 2, size / 2, size * 0.36, 0, Math.PI * 2);
+  ctx.arc(width / 2, height / 2, Math.min(width, height) * 0.36, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.fillStyle = "#f3ead8";
@@ -129,7 +131,7 @@ function drawPlaceholderAvatar(ctx, size) {
     .map((word) => word[0]?.toUpperCase() || "")
     .join("");
 
-  ctx.fillText(initials || "V2", size / 2, size / 2);
+  ctx.fillText(initials || "V2", width / 2, height / 2);
 }
 
 function canvasToBlob(canvas) {

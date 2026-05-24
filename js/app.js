@@ -5,9 +5,12 @@ import { handleFile, setupFileImport } from "./fileImport.js";
 import { createDefaultCard, createDefaultLorebook } from "./templates.js";
 import { renderLorebookEditor, setupLorebookEditor } from "./lorebookEditor.js";
 import {
+  clearCurrentProject,
   loadSavedDraft,
   saveDraft,
   setCurrentAvatar,
+  setCurrentAvatarImageType,
+  setCurrentAvatarCrop,
   setCurrentLorebook,
   state
 } from "./state.js";
@@ -16,6 +19,7 @@ import {
   renderBotWithLorebookWorkspace,
   setupCombinedWorkspace
 } from "./workspaceCombined.js";
+import { confirmAction, setupConfirmDialog } from "./confirmDialog.js";
 
 await loadPartials();
 
@@ -47,6 +51,7 @@ const fileTypeStatus = document.getElementById("fileTypeStatus");
 const workspacePanel = document.getElementById("workspacePanel");
 const workspaceTitle = document.getElementById("workspaceTitle");
 const emptyState = document.getElementById("emptyState");
+const clearProjectButton = document.getElementById("clearProjectButton");
 const saveDraftButton = document.getElementById("saveDraftButton");
 const exportButton = document.getElementById("exportButton");
 
@@ -85,6 +90,8 @@ setupFileExport({
   fileTypeStatus
 });
 
+setupConfirmDialog();
+
 /* ================================
    Sidebar
 ================================ */
@@ -108,10 +115,10 @@ function setTheme(theme) {
   localStorage.setItem("arloxe-theme", theme);
 
   if (theme === "light") {
-    themeIcon.textContent = "☀️";
+    themeIcon.className = "theme-icon ui-icon ui-icon-theme";
     themeLabel.textContent = "Light";
   } else {
-    themeIcon.textContent = "🌙";
+    themeIcon.className = "theme-icon ui-icon ui-icon-theme";
     themeLabel.textContent = "Dark";
   }
 }
@@ -150,6 +157,13 @@ function closeSettingsPanel() {
   settingsPanel.setAttribute("aria-hidden", "true");
 }
 
+function resetWorkspaceView() {
+  document.getElementById("editorMount")?.remove();
+  document.getElementById("exportPngButton")?.remove();
+  workspaceTitle.textContent = "Nothing open yet";
+  emptyState.style.display = "";
+}
+
 /* ================================
    Actions
 ================================ */
@@ -164,15 +178,22 @@ function handleAction(action) {
   setActiveAction(action);
 
   if (action === "new-bot") {
+    document.getElementById("editorMount")?.remove();
     setCurrentAvatar(null);
+    setCurrentAvatarImageType();
+    setCurrentAvatarCrop();
     renderCardEditor(createDefaultCard());
     fileTypeStatus.textContent = "New bot created";
+    scrollToWorkspace();
     closeSidebar();
     return;
   }
 
   if (action === "new-bot-lorebook") {
+  document.getElementById("editorMount")?.remove();
   setCurrentAvatar(null);
+  setCurrentAvatarImageType();
+  setCurrentAvatarCrop();
 
   const card = createDefaultCard();
   card.data.character_book = createDefaultLorebook();
@@ -180,17 +201,23 @@ function handleAction(action) {
   renderBotWithLorebookWorkspace(card);
 
   fileTypeStatus.textContent = "New bot with empty lorebook";
+  scrollToWorkspace();
   closeSidebar();
   return;
   }
 
   if (action === "new-lorebook") {
+  document.getElementById("editorMount")?.remove();
+  document.getElementById("exportPngButton")?.remove();
   setCurrentAvatar(null);
+  setCurrentAvatarImageType();
+  setCurrentAvatarCrop();
   setCurrentLorebook(createDefaultLorebook());
 
   renderLorebookEditor(state.currentLorebook, { mode: "standalone" });
 
   fileTypeStatus.textContent = "New lorebook created";
+  scrollToWorkspace();
   closeSidebar();
   return;
   }
@@ -202,6 +229,15 @@ function handleAction(action) {
     });
     closeSidebar();
   }
+}
+
+function scrollToWorkspace() {
+  requestAnimationFrame(() => {
+    workspaceTitle?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  });
 }
 
 /* ================================
@@ -263,6 +299,26 @@ saveDraftButton?.addEventListener("click", () => {
   fileTypeStatus.textContent = result.message;
 });
 
+clearProjectButton?.addEventListener("click", async () => {
+  if (!state.currentCard && !state.currentLorebook) {
+    fileTypeStatus.textContent = "Nothing to clear";
+    return;
+  }
+
+  const shouldClear = await confirmAction({
+    title: "Clear current character?",
+    message: "This removes the open character, lorebook, avatar, and local draft from this browser.",
+    confirmLabel: "Clear Character"
+  });
+
+  if (!shouldClear) return;
+
+  clearCurrentProject();
+  localStorage.removeItem("arloxe-current-card");
+  resetWorkspaceView();
+  fileTypeStatus.textContent = "Character cleared";
+});
+
 exportButton?.addEventListener("click", exportCurrentCardJson);
 
 document.addEventListener("arloxe:export-png", exportCurrentCardPng);
@@ -285,6 +341,7 @@ dropZone?.addEventListener("click", () => {
 fileInput?.addEventListener("change", (event) => {
   const file = event.target.files[0];
   handleFile(file);
+  event.target.value = "";
 });
 
 dropZone?.addEventListener("dragover", (event) => {

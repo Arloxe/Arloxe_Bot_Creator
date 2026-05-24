@@ -1,4 +1,4 @@
-import { clampCrop01, computeCropRect, MAX_AVATAR_ZOOM } from "./utils.js";
+import { clampCrop01, computeCropRect, getAvatarOutput, MAX_AVATAR_ZOOM } from "./utils.js";
 
 /* ================================
    Avatar Cropper
@@ -9,13 +9,13 @@ import { clampCrop01, computeCropRect, MAX_AVATAR_ZOOM } from "./utils.js";
 
 // Position/scale a preview <img> inside a square box so it shows exactly the
 // crop region. Shared by the editor's small avatar preview.
-export function applyCropToImage(imageEl, boxSize, crop) {
+export function applyCropToImage(imageEl, boxWidth, boxHeight, crop, imageType = "square") {
   const nw = imageEl.naturalWidth;
   const nh = imageEl.naturalHeight;
-  if (!nw || !nh || !boxSize) return;
+  if (!nw || !nh || !boxWidth || !boxHeight) return;
 
-  const { sx, sy, side } = computeCropRect(nw, nh, crop);
-  const scale = boxSize / side; // display px per source px
+  const { sx, sy, sw, sh } = computeCropRect(nw, nh, crop, imageType);
+  const scale = Math.max(boxWidth / sw, boxHeight / sh); // display px per source px
 
   imageEl.style.width = `${nw * scale}px`;
   imageEl.style.height = `${nh * scale}px`;
@@ -39,7 +39,7 @@ function getElements() {
 
 // Opens the cropper for the given image. Resolves with a new { x, y, zoom }
 // crop on Apply, or null if the user cancels/closes.
-export function openAvatarCropper(dataUrl, initialCrop) {
+export function openAvatarCropper(dataUrl, initialCrop, imageType = "square") {
   return new Promise((resolve) => {
     const el = getElements();
     if (!el || !el.stage || !el.image) {
@@ -49,7 +49,8 @@ export function openAvatarCropper(dataUrl, initialCrop) {
 
     let nw = 0;
     let nh = 0;
-    let boxSize = 0;
+    let boxWidth = 0;
+    let boxHeight = 0;
     let baseScale = 0; // scale at zoom 1 (smaller dimension fills the stage)
     let scale = 0;
     let zoom = 1;
@@ -65,8 +66,8 @@ export function openAvatarCropper(dataUrl, initialCrop) {
     function clampPan() {
       const dispW = nw * scale;
       const dispH = nh * scale;
-      left = Math.min(0, Math.max(boxSize - dispW, left));
-      top = Math.min(0, Math.max(boxSize - dispH, top));
+      left = Math.min(0, Math.max(boxWidth - dispW, left));
+      top = Math.min(0, Math.max(boxHeight - dispH, top));
     }
 
     function render() {
@@ -78,8 +79,8 @@ export function openAvatarCropper(dataUrl, initialCrop) {
 
     // Re-zoom while keeping the stage's centre pinned to the same source pixel.
     function setZoom(nextZoom) {
-      const focalX = boxSize / 2;
-      const focalY = boxSize / 2;
+      const focalX = boxWidth / 2;
+      const focalY = boxHeight / 2;
       const srcX = (focalX - left) / scale;
       const srcY = (focalY - top) / scale;
 
@@ -119,11 +120,19 @@ export function openAvatarCropper(dataUrl, initialCrop) {
       setZoom(Number(el.zoom.value) / 100);
     }
 
+    function onWheel(event) {
+      event.preventDefault();
+      const direction = event.deltaY > 0 ? -1 : 1;
+      const nextZoom = zoom + direction * 0.08;
+      setZoom(nextZoom);
+      if (el.zoom) el.zoom.value = Math.round(zoom * 100);
+    }
+
     function onResetClick() {
       zoom = 1;
       scale = baseScale;
-      left = (boxSize - nw * scale) / 2;
-      top = (boxSize - nh * scale) / 2;
+      left = (boxWidth - nw * scale) / 2;
+      top = (boxHeight - nh * scale) / 2;
       clampPan();
       if (el.zoom) el.zoom.value = 100;
       render();
@@ -134,11 +143,12 @@ export function openAvatarCropper(dataUrl, initialCrop) {
     }
 
     function applyCrop() {
-      const side = boxSize / scale; // source px shown in the stage
+      const sw = boxWidth / scale; // source px shown in the stage
+      const sh = boxHeight / scale;
       const sx = -left / scale;
       const sy = -top / scale;
-      const slackX = nw - side;
-      const slackY = nh - side;
+      const slackX = nw - sw;
+      const slackY = nh - sh;
 
       finish({
         x: slackX > 0 ? clampCrop01(sx / slackX) : 0,
@@ -153,6 +163,7 @@ export function openAvatarCropper(dataUrl, initialCrop) {
       document.body.classList.remove("modal-open");
 
       el.stage.removeEventListener("pointerdown", onPointerDown);
+      el.stage.removeEventListener("wheel", onWheel);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       el.zoom?.removeEventListener("input", onZoomInput);
@@ -179,11 +190,14 @@ export function openAvatarCropper(dataUrl, initialCrop) {
     function initFromImage() {
       nw = el.image.naturalWidth;
       nh = el.image.naturalHeight;
-      boxSize = el.stage.clientWidth;
-      if (!nw || !nh || !boxSize) return;
+      const output = getAvatarOutput(imageType);
+      el.stage.style.aspectRatio = `${output.width} / ${output.height}`;
+      boxWidth = el.stage.clientWidth;
+      boxHeight = el.stage.clientHeight;
+      if (!nw || !nh || !boxWidth || !boxHeight) return;
 
-      const minDim = Math.min(nw, nh);
-      baseScale = boxSize / minDim;
+      const baseRect = computeCropRect(nw, nh, { x: 0.5, y: 0.5, zoom: 1 }, imageType);
+      baseScale = Math.max(boxWidth / baseRect.sw, boxHeight / baseRect.sh);
 
       const crop = initialCrop || { x: 0.5, y: 0.5, zoom: 1 };
       zoom = Math.min(MAX_AVATAR_ZOOM, Math.max(1, Number(crop.zoom) || 1));
@@ -193,7 +207,7 @@ export function openAvatarCropper(dataUrl, initialCrop) {
         x: crop.x ?? 0.5,
         y: crop.y ?? 0.5,
         zoom
-      });
+      }, imageType);
       left = -sx * scale;
       top = -sy * scale;
       clampPan();
@@ -212,6 +226,7 @@ export function openAvatarCropper(dataUrl, initialCrop) {
     if (el.image.complete && el.image.naturalWidth) initFromImage();
 
     el.stage.addEventListener("pointerdown", onPointerDown);
+    el.stage.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
     el.zoom?.addEventListener("input", onZoomInput);

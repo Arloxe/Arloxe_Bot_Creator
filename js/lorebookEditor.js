@@ -6,6 +6,7 @@ import {
 } from "./state.js";
 
 import { createDefaultLorebookEntry } from "./templates.js";
+import { confirmAction } from "./confirmDialog.js";
 import { escapeHtml } from "./utils.js";
 
 let workspacePanel = null;
@@ -39,7 +40,7 @@ export function renderLorebookEditor(lorebook, options = {}) {
     <form class="editor-form" id="lorebookEditorForm">
       <div class="editor-section">
         <div class="section-title">
-          <span>📚</span>
+          <span class="ui-icon ui-icon-book" aria-hidden="true"></span>
           <div>
             <h3>Lorebook Settings</h3>
             <p>Global scan and insertion behavior for this lorebook.</p>
@@ -160,7 +161,7 @@ function renderLorebookEntries() {
   if (entries.length === 0) {
     list.innerHTML = `
       <div class="mini-empty-state">
-        <span>🌱</span>
+        <span class="ui-icon ui-icon-book" aria-hidden="true"></span>
         <p>No lorebook entries yet.</p>
       </div>
     `;
@@ -259,11 +260,18 @@ function wireEntryEvents() {
   const list = document.getElementById("lorebookEntryList");
 
   list.querySelectorAll("[data-remove-lorebook-entry]").forEach((button) => {
-    button.addEventListener("click", (event) => {
+    button.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
 
       const index = Number(button.dataset.removeLorebookEntry);
+      const shouldRemove = await confirmAction({
+        title: "Remove lorebook entry?",
+        message: "This entry will be removed from the current lorebook.",
+        confirmLabel: "Remove"
+      });
+      if (!shouldRemove) return;
+
       state.currentLorebook.entries.splice(index, 1);
       renderLorebookEntries();
       syncEmbeddedLorebook();

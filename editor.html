@@ -37,7 +37,7 @@
 
       <nav class="sidebar-nav">
         <button class="nav-action active" type="button" data-action="new-bot">
-          <span class="nav-icon">🧍</span>
+          <span class="nav-icon ui-icon ui-icon-user" aria-hidden="true"></span>
           <span>
             <strong>Create a New Bot</strong>
             <small>Make a clean Character Card V2.</small>
@@ -45,7 +45,7 @@
         </button>
 
         <button class="nav-action" type="button" data-action="new-lorebook">
-          <span class="nav-icon">📚</span>
+          <span class="nav-icon ui-icon ui-icon-book" aria-hidden="true"></span>
           <span>
             <strong>Create a New Lorebook</strong>
             <small>Build a standalone lorebook/world info file.</small>
@@ -53,7 +53,7 @@
         </button>
 
         <button class="nav-action" type="button" data-action="new-bot-lorebook">
-          <span class="nav-icon">🧬</span>
+          <span class="nav-icon ui-icon ui-icon-combined" aria-hidden="true"></span>
           <span>
             <strong>Create Bot w/ Lorebook</strong>
             <small>Make a card with an embedded lorebook.</small>
@@ -61,7 +61,7 @@
         </button>
 
         <button class="nav-action" type="button" data-action="edit-file">
-          <span class="nav-icon">🛠️</span>
+          <span class="nav-icon ui-icon ui-icon-edit-existing" aria-hidden="true"></span>
           <span>
             <strong>Edit Existing File</strong>
             <small>Import and auto-detect card/lorebook type.</small>
@@ -91,25 +91,25 @@
 
       <section class="action-grid" aria-label="Creation options">
         <button class="action-card" type="button" data-action="new-bot">
-          <span class="card-icon">🧍</span>
+          <span class="card-icon ui-icon ui-icon-user" aria-hidden="true"></span>
           <h3>Create a New Bot</h3>
           <p>Start with a fresh Character Card V2 template.</p>
         </button>
 
         <button class="action-card" type="button" data-action="new-lorebook">
-          <span class="card-icon">📚</span>
+          <span class="card-icon ui-icon ui-icon-book" aria-hidden="true"></span>
           <h3>Create a New Lorebook</h3>
           <p>Make standalone lore entries, keywords, and world info.</p>
         </button>
 
         <button class="action-card" type="button" data-action="new-bot-lorebook">
-          <span class="card-icon">🧬</span>
+          <span class="card-icon ui-icon ui-icon-combined" aria-hidden="true"></span>
           <h3>Bot + Lorebook</h3>
           <p>Create a character and connect lorebook entries side by side.</p>
         </button>
 
         <button class="action-card" type="button" data-action="edit-file">
-          <span class="card-icon">🛠️</span>
+          <span class="card-icon ui-icon ui-icon-edit-existing" aria-hidden="true"></span>
           <h3>Edit Existing File</h3>
           <p>Drop in a JSON or supported card file and let the forge inspect it.</p>
         </button>
@@ -129,16 +129,16 @@
           <input
             type="file"
             id="fileInput"
-            accept=".json,.png"
+            accept=".json,.png,.jpg,.jpeg,.webp"
             hidden
           />
 
           <div class="drop-zone-content">
-            <span class="drop-icon">⬆️</span>
+            <span class="drop-icon ui-icon ui-icon-upload" aria-hidden="true"></span>
             <h3>Drop your file here</h3>
             <p>
               Or click to browse. The forge will try to detect whether it is
-              a bot, lorebook, or bot with lorebook.
+              a bot, lorebook, bot with lorebook, or avatar image.
             </p>
 
             <button class="primary-button" type="button" id="browseFileButton">
@@ -156,6 +156,10 @@
           </div>
 
           <div class="panel-actions">
+            <button class="secondary-button danger-outline-button" type="button" id="clearProjectButton">
+              Clear Character
+            </button>
+
             <button class="secondary-button" type="button" id="saveDraftButton">
               Save Draft
             </button>
@@ -167,7 +171,7 @@
         </div>
 
         <div class="empty-state" id="emptyState">
-          <span>📝</span>
+          <span class="ui-icon ui-icon-note" aria-hidden="true"></span>
           <h3>Your editor will appear here.</h3>
           <p>
             Pick a creation option or import a file to start shaping your character goblin.
@@ -181,7 +185,7 @@
     <div data-partial="partials/image_preview_fragment.html"></div>
 
     <button class="settings-button" id="settingsButton" type="button" aria-label="Open settings">
-      ⚙️
+      <span class="ui-icon ui-icon-settings" aria-hidden="true"></span>
     </button>
 
     <aside class="settings-panel" id="settingsPanel" aria-hidden="true">

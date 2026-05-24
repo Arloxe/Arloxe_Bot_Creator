@@ -91,10 +91,332 @@
   border: 1px solid rgba(111, 143, 99, 0.35);
 }
 
+.secondary-button .button-icon {
+  width: 1.45em;
+  height: 1.45em;
+  margin-right: 0.35rem;
+  vertical-align: -0.45em;
+}
+
 .secondary-button:hover {
   transform: translateY(-1px);
   border-color: var(--green);
   background: rgba(111, 143, 99, 0.24);
+}
+
+.danger-button,
+.danger-outline-button {
+  border-color: rgba(208, 106, 106, 0.5);
+}
+
+.danger-button {
+  color: #1b0d0d;
+  background: linear-gradient(135deg, #d98670, var(--danger));
+}
+
+.danger-outline-button {
+  color: var(--text);
+  background: rgba(208, 106, 106, 0.12);
+}
+
+.danger-outline-button:hover {
+  border-color: var(--danger);
+  background: rgba(208, 106, 106, 0.2);
+}
+
+/* ================================
+   Themed UI Icons
+================================ */
+
+.ui-icon {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+
+  color: var(--accent);
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.16), transparent 34%),
+    var(--green-soft);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+}
+
+.ui-icon::before,
+.ui-icon::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.ui-icon-image::before {
+  width: 15px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+}
+
+.ui-icon-image::after {
+  width: 7px;
+  height: 7px;
+  right: 6px;
+  bottom: 6px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.ui-icon-user::before {
+  width: 8px;
+  height: 8px;
+  top: 6px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.ui-icon-user::after {
+  width: 16px;
+  height: 9px;
+  bottom: 5px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+
+.ui-icon-persona::before,
+.ui-icon-message::before,
+.ui-icon-note::before {
+  width: 15px;
+  height: 15px;
+  border: 2px solid currentColor;
+}
+
+.ui-icon-persona::before {
+  border-radius: 50%;
+}
+
+.ui-icon-persona::after {
+  width: 2px;
+  height: 10px;
+  background: currentColor;
+  transform: rotate(45deg);
+}
+
+.ui-icon-message::before {
+  border-radius: 5px;
+}
+
+.ui-icon-message::after {
+  left: 8px;
+  bottom: 5px;
+  border-top: 6px solid currentColor;
+  border-right: 6px solid transparent;
+}
+
+.ui-icon-greetings::before {
+  width: 16px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 50% 50% 42% 42%;
+}
+
+.ui-icon-greetings::after {
+  width: 3px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 50%;
+  box-shadow: 7px 0 0 currentColor;
+}
+
+.ui-icon-settings::before {
+  width: 15px;
+  height: 15px;
+  border: 2px dashed currentColor;
+  border-radius: 50%;
+}
+
+.ui-icon-settings::after {
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.ui-icon-note::before {
+  border-radius: 3px;
+}
+
+.ui-icon-note::after {
+  width: 9px;
+  height: 2px;
+  background: currentColor;
+  box-shadow: 0 5px 0 currentColor;
+}
+
+.ui-icon-book::before {
+  width: 15px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-left-width: 4px;
+  border-radius: 3px;
+}
+
+.ui-icon-book::after {
+  width: 7px;
+  height: 2px;
+  right: 6px;
+  background: currentColor;
+  box-shadow: 0 5px 0 currentColor;
+}
+
+.ui-icon-combined::before,
+.ui-icon-combined::after {
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.ui-icon-combined::before {
+  left: 5px;
+  top: 6px;
+}
+
+.ui-icon-combined::after {
+  right: 5px;
+  bottom: 6px;
+}
+
+.ui-icon-edit::before {
+  width: 15px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 999px;
+  transform: rotate(-42deg);
+}
+
+.ui-icon-edit::after {
+  right: 6px;
+  bottom: 7px;
+  border-top: 4px solid currentColor;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  transform: rotate(-42deg);
+}
+
+.ui-icon-upload::before {
+  width: 3px;
+  height: 16px;
+  background: currentColor;
+  border-radius: 999px;
+}
+
+.ui-icon-upload::after {
+  top: 7px;
+  width: 11px;
+  height: 11px;
+  border-top: 3px solid currentColor;
+  border-left: 3px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.ui-icon-sun::before {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  box-shadow:
+    0 -9px 0 -5px currentColor,
+    0 9px 0 -5px currentColor,
+    -9px 0 0 -5px currentColor,
+    9px 0 0 -5px currentColor;
+}
+
+.ui-icon-moon::before {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  box-shadow: -5px 0 0 0 currentColor;
+  transform: translateX(4px);
+}
+
+.ui-icon-warning::before {
+  width: 0;
+  height: 0;
+  border-right: 8px solid transparent;
+  border-bottom: 15px solid currentColor;
+  border-left: 8px solid transparent;
+}
+
+.ui-icon-warning::after {
+  width: 2px;
+  height: 7px;
+  top: 11px;
+  background: var(--bg);
+  box-shadow: 0 9px 0 var(--bg);
+}
+
+/* ================================
+   Confirm Dialog
+================================ */
+
+.confirm-dialog[hidden] {
+  display: none;
+}
+
+.confirm-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.confirm-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(4px);
+}
+
+.confirm-dialog-panel {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+
+  width: min(430px, 100%);
+  padding: 1.15rem;
+
+  background: var(--panel-strong);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.confirm-dialog-copy h3,
+.confirm-dialog-copy p {
+  margin: 0;
+}
+
+.confirm-dialog-copy p {
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  grid-column: 1 / -1;
 }
 
 /* ================================
@@ -642,4 +964,379 @@ html[data-theme="light"] .setting-row {
     bottom: 4.75rem;
     width: calc(100vw - 1rem);
   }
+}
+
+/* ================================
+   Themed PNG icon tiles
+   Arloxe's illustrated rounded-tile icons (assets/<name>_<variant>.png).
+   They are self-contained tiles, so we strip the surrounding icon-box chrome
+   (background/border) and hide the CSS-drawn glyph (drawn in currentColor, so
+   color:transparent hides it). The tile swaps with the active accent:
+     forest-gold -> _default,  soft-gold -> _gold,  deep-green -> _green
+   Scoped by container so the dual-use .ui-icon-book and the gold settings
+   button resolve correctly without specificity fights.
+================================ */
+
+.card-icon.ui-icon-user,
+.nav-icon.ui-icon-user,
+.section-title .ui-icon-user,
+.card-icon.ui-icon-book,
+.nav-icon.ui-icon-book,
+.card-icon.ui-icon-combined,
+.nav-icon.ui-icon-combined,
+.section-title .ui-icon-image,
+.section-title .ui-icon-persona,
+.section-title .ui-icon-message,
+.section-title .ui-icon-book,
+.section-title .ui-icon-settings {
+  color: transparent;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: none;
+}
+
+/* --- Default accent (forest-gold) --- */
+.card-icon.ui-icon-user,
+.nav-icon.ui-icon-user,
+.section-title .ui-icon-user {
+  background-image: url("../assets/icons/new_character_default.png");
+}
+.card-icon.ui-icon-book,
+.nav-icon.ui-icon-book {
+  background-image: url("../assets/icons/new_lorebook_default.png");
+}
+.card-icon.ui-icon-combined,
+.nav-icon.ui-icon-combined {
+  background-image: url("../assets/icons/new_lorebook_bot_default.png");
+}
+.section-title .ui-icon-image {
+  background-image: url("../assets/icons/avatar_default.png");
+}
+.section-title .ui-icon-persona {
+  background-image: url("../assets/icons/persona_default.png");
+}
+.section-title .ui-icon-message {
+  background-image: url("../assets/icons/messages_default.png");
+}
+.section-title .ui-icon-book {
+  background-image: url("../assets/icons/lorebook_default.png");
+}
+.section-title .ui-icon-settings {
+  background-image: url("../assets/icons/settings_default.png");
+}
+
+/* --- Soft-gold accent --- */
+html[data-accent="soft-gold"] .card-icon.ui-icon-user,
+html[data-accent="soft-gold"] .nav-icon.ui-icon-user,
+html[data-accent="soft-gold"] .section-title .ui-icon-user {
+  background-image: url("../assets/icons/new_character_gold.png");
+}
+html[data-accent="soft-gold"] .card-icon.ui-icon-book,
+html[data-accent="soft-gold"] .nav-icon.ui-icon-book {
+  background-image: url("../assets/icons/new_lorebook_gold.png");
+}
+html[data-accent="soft-gold"] .card-icon.ui-icon-combined,
+html[data-accent="soft-gold"] .nav-icon.ui-icon-combined {
+  background-image: url("../assets/icons/new_lorebook_bot_gold.png");
+}
+html[data-accent="soft-gold"] .section-title .ui-icon-image {
+  background-image: url("../assets/icons/avatar_gold.png");
+}
+html[data-accent="soft-gold"] .section-title .ui-icon-persona {
+  background-image: url("../assets/icons/persona_gold.png");
+}
+html[data-accent="soft-gold"] .section-title .ui-icon-message {
+  background-image: url("../assets/icons/messages_gold.png");
+}
+html[data-accent="soft-gold"] .section-title .ui-icon-book {
+  background-image: url("../assets/icons/lorebook_gold.png");
+}
+html[data-accent="soft-gold"] .section-title .ui-icon-settings {
+  background-image: url("../assets/icons/settings_gold.png");
+}
+
+/* --- Deep-green accent --- */
+html[data-accent="deep-green"] .card-icon.ui-icon-user,
+html[data-accent="deep-green"] .nav-icon.ui-icon-user,
+html[data-accent="deep-green"] .section-title .ui-icon-user {
+  background-image: url("../assets/icons/new_character_green.png");
+}
+html[data-accent="deep-green"] .card-icon.ui-icon-book,
+html[data-accent="deep-green"] .nav-icon.ui-icon-book {
+  background-image: url("../assets/icons/new_lorebook_green.png");
+}
+html[data-accent="deep-green"] .card-icon.ui-icon-combined,
+html[data-accent="deep-green"] .nav-icon.ui-icon-combined {
+  background-image: url("../assets/icons/new_lorebook_bot_green.png");
+}
+html[data-accent="deep-green"] .section-title .ui-icon-image {
+  background-image: url("../assets/icons/avatar_green.png");
+}
+html[data-accent="deep-green"] .section-title .ui-icon-persona {
+  background-image: url("../assets/icons/persona_green.png");
+}
+html[data-accent="deep-green"] .section-title .ui-icon-message {
+  background-image: url("../assets/icons/messages_green.png");
+}
+html[data-accent="deep-green"] .section-title .ui-icon-book {
+  background-image: url("../assets/icons/lorebook_green.png");
+}
+html[data-accent="deep-green"] .section-title .ui-icon-settings {
+  background-image: url("../assets/icons/settings_green.png");
+}
+
+/* --- Dark/light themed additions --- */
+.card-icon.ui-icon-edit-existing,
+.nav-icon.ui-icon-edit-existing,
+.button-icon.ui-icon-edit,
+.theme-icon.ui-icon-open-editor,
+.theme-icon.ui-icon-theme,
+.section-title .ui-icon-character-note,
+.section-title .ui-icon-greetings,
+.mini-empty-state .ui-icon-greetings,
+.empty-state .ui-icon-note,
+.confirm-dialog-icon .ui-icon-warning {
+  color: transparent;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: none;
+}
+
+.card-icon.ui-icon-edit-existing,
+.nav-icon.ui-icon-edit-existing {
+  background-image: url("../assets/icons/edit_existing_card_dark_default.png");
+}
+.button-icon.ui-icon-edit {
+  background-image: url("../assets/icons/edit_dark_default.png");
+}
+.theme-icon.ui-icon-open-editor {
+  background-image: url("../assets/icons/open_editor_dark_default.png");
+}
+.theme-icon.ui-icon-theme {
+  background-image: url("../assets/icons/theme_dark_default.png");
+}
+.section-title .ui-icon-character-note {
+  background-image: url("../assets/icons/character_note_dark_default.png");
+}
+.section-title .ui-icon-greetings,
+.mini-empty-state .ui-icon-greetings {
+  background-image: url("../assets/icons/greetings_dark_default.png");
+}
+.empty-state .ui-icon-note {
+  background-image: url("../assets/icons/note_dark_default.png");
+}
+.confirm-dialog-icon .ui-icon-warning {
+  background-image: url("../assets/icons/warning_dark_default.png");
+}
+
+html[data-accent="soft-gold"] .card-icon.ui-icon-edit-existing,
+html[data-accent="soft-gold"] .nav-icon.ui-icon-edit-existing {
+  background-image: url("../assets/icons/edit_existing_card_dark_gold.png");
+}
+html[data-accent="soft-gold"] .button-icon.ui-icon-edit {
+  background-image: url("../assets/icons/edit_dark_gold.png");
+}
+html[data-accent="soft-gold"] .theme-icon.ui-icon-open-editor {
+  background-image: url("../assets/icons/open_editor_dark_gold.png");
+}
+html[data-accent="soft-gold"] .theme-icon.ui-icon-theme {
+  background-image: url("../assets/icons/theme_dark_gold.png");
+}
+html[data-accent="soft-gold"] .section-title .ui-icon-character-note {
+  background-image: url("../assets/icons/character_note_dark_gold.png");
+}
+html[data-accent="soft-gold"] .section-title .ui-icon-greetings,
+html[data-accent="soft-gold"] .mini-empty-state .ui-icon-greetings {
+  background-image: url("../assets/icons/greetings_dark_gold.png");
+}
+html[data-accent="soft-gold"] .empty-state .ui-icon-note {
+  background-image: url("../assets/icons/note_dark_gold.png");
+}
+html[data-accent="soft-gold"] .confirm-dialog-icon .ui-icon-warning {
+  background-image: url("../assets/icons/warning_dark_gold.png");
+}
+
+html[data-accent="deep-green"] .card-icon.ui-icon-edit-existing,
+html[data-accent="deep-green"] .nav-icon.ui-icon-edit-existing {
+  background-image: url("../assets/icons/edit_existing_card_dark_green.png");
+}
+html[data-accent="deep-green"] .button-icon.ui-icon-edit {
+  background-image: url("../assets/icons/edit_dark_green.png");
+}
+html[data-accent="deep-green"] .theme-icon.ui-icon-open-editor {
+  background-image: url("../assets/icons/open_editor_dark_green.png");
+}
+html[data-accent="deep-green"] .theme-icon.ui-icon-theme {
+  background-image: url("../assets/icons/theme_dark_green.png");
+}
+html[data-accent="deep-green"] .section-title .ui-icon-character-note {
+  background-image: url("../assets/icons/character_note_dark_green.png");
+}
+html[data-accent="deep-green"] .section-title .ui-icon-greetings,
+html[data-accent="deep-green"] .mini-empty-state .ui-icon-greetings {
+  background-image: url("../assets/icons/greetings_dark_green.png");
+}
+html[data-accent="deep-green"] .empty-state .ui-icon-note {
+  background-image: url("../assets/icons/note_dark_green.png");
+}
+html[data-accent="deep-green"] .confirm-dialog-icon .ui-icon-warning {
+  background-image: url("../assets/icons/warning_dark_green.png");
+}
+
+html[data-theme="light"] .card-icon.ui-icon-edit-existing,
+html[data-theme="light"] .nav-icon.ui-icon-edit-existing {
+  background-image: url("../assets/icons/edit_existing_card_light_default.png");
+}
+html[data-theme="light"] .button-icon.ui-icon-edit {
+  background-image: url("../assets/icons/edit_light_default.png");
+}
+html[data-theme="light"] .theme-icon.ui-icon-open-editor {
+  background-image: url("../assets/icons/open_editor_light_default.png");
+}
+html[data-theme="light"] .theme-icon.ui-icon-theme {
+  background-image: url("../assets/icons/theme_light_default.png");
+}
+html[data-theme="light"] .section-title .ui-icon-character-note {
+  background-image: url("../assets/icons/character_note_light_default.png");
+}
+html[data-theme="light"] .section-title .ui-icon-greetings,
+html[data-theme="light"] .mini-empty-state .ui-icon-greetings {
+  background-image: url("../assets/icons/greetings_light_default.png");
+}
+html[data-theme="light"] .empty-state .ui-icon-note {
+  background-image: url("../assets/icons/note_light_default.png");
+}
+html[data-theme="light"] .confirm-dialog-icon .ui-icon-warning {
+  background-image: url("../assets/icons/warning_light_default.png");
+}
+
+html[data-theme="light"][data-accent="soft-gold"] .card-icon.ui-icon-edit-existing,
+html[data-theme="light"][data-accent="soft-gold"] .nav-icon.ui-icon-edit-existing {
+  background-image: url("../assets/icons/edit_existing_card_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .button-icon.ui-icon-edit {
+  background-image: url("../assets/icons/edit_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .theme-icon.ui-icon-open-editor {
+  background-image: url("../assets/icons/open_editor_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .theme-icon.ui-icon-theme {
+  background-image: url("../assets/icons/theme_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .section-title .ui-icon-character-note {
+  background-image: url("../assets/icons/character_note_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .section-title .ui-icon-greetings,
+html[data-theme="light"][data-accent="soft-gold"] .mini-empty-state .ui-icon-greetings {
+  background-image: url("../assets/icons/greetings_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .empty-state .ui-icon-note {
+  background-image: url("../assets/icons/note_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .confirm-dialog-icon .ui-icon-warning {
+  background-image: url("../assets/icons/warning_light_gold.png");
+}
+
+html[data-theme="light"][data-accent="deep-green"] .card-icon.ui-icon-edit-existing,
+html[data-theme="light"][data-accent="deep-green"] .nav-icon.ui-icon-edit-existing {
+  background-image: url("../assets/icons/edit_existing_card_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .button-icon.ui-icon-edit {
+  background-image: url("../assets/icons/edit_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .theme-icon.ui-icon-open-editor {
+  background-image: url("../assets/icons/open_editor_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .theme-icon.ui-icon-theme {
+  background-image: url("../assets/icons/theme_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .section-title .ui-icon-character-note {
+  background-image: url("../assets/icons/character_note_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .section-title .ui-icon-greetings,
+html[data-theme="light"][data-accent="deep-green"] .mini-empty-state .ui-icon-greetings {
+  background-image: url("../assets/icons/greetings_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .empty-state .ui-icon-note {
+  background-image: url("../assets/icons/note_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .confirm-dialog-icon .ui-icon-warning {
+  background-image: url("../assets/icons/warning_light_green.png");
+}
+
+/* Floating bottom-right settings button: show the settings tile on the button
+   itself (it's 58px; the inner glyph span is only 28px) and hide the glyph.
+   Strip the gold-circle chrome so the tile stands alone. */
+.settings-button {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: none;
+  box-shadow: none;
+  background-image: url("../assets/icons/settings_default.png");
+}
+html[data-accent="soft-gold"] .settings-button {
+  background-image: url("../assets/icons/settings_gold.png");
+}
+html[data-accent="deep-green"] .settings-button {
+  background-image: url("../assets/icons/settings_green.png");
+}
+.settings-button .ui-icon-settings {
+  display: none;
+}
+
+/* ================================
+   Drop-zone illustration
+   Arloxe's drop_your_file_here_*.png is a full illustration (heading + sub-text
+   baked in). Show it in place of the glyph + text, keep the "Choose File"
+   button, and drop the box's own border so it doesn't double up with the
+   illustration's baked dashed border (an accent ring still appears on hover).
+================================ */
+
+.drop-zone {
+  background: none;
+  border-color: transparent;
+}
+
+html[data-theme="light"] .drop-zone {
+  background: none;
+}
+
+.drop-zone .drop-icon,
+.drop-zone h3,
+.drop-zone p {
+  display: none;
+}
+
+/* With the text hidden, the grid's place-items:center would shrink the
+   content to the button width; give it a definite width so the illustration
+   sizes off the drop-zone, not the button. */
+.drop-zone-content {
+  width: 100%;
+}
+
+.drop-zone-content::before {
+  content: "";
+  display: block;
+  width: min(100%, 440px);
+  aspect-ratio: 1448 / 1086;
+  margin: 0 auto 1rem;
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url("../assets/icons/drop_your_file_here_default.png");
+}
+
+html[data-accent="soft-gold"] .drop-zone-content::before {
+  background-image: url("../assets/icons/drop_your_file_here_gold.png");
+}
+
+html[data-accent="deep-green"] .drop-zone-content::before {
+  background-image: url("../assets/icons/drop_your_file_here_green.png");
 }

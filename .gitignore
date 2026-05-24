@@ -2,6 +2,9 @@
 run-local.bat
 assets/test.png
 
+# Heavy source icons (optimized copies live in assets/icons/ and ARE committed)
+assets/icon_src/
+
 # OS / editor cruft
 Thumbs.db
 Desktop.ini

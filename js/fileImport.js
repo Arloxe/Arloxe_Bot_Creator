@@ -1,9 +1,9 @@
-import { renderCardEditor } from "./botEditor.js";
+﻿import { renderCardEditor } from "./botEditor.js";
 import { renderLorebookEditor } from "./lorebookEditor.js";
 import { createDefaultCard } from "./templates.js";
-import { clone, fileToDataUrl } from "./utils.js";
+import { clone, fileToDataUrl, inferAvatarImageType } from "./utils.js";
 import { extractCardJsonFromPng } from "./pngCards.js";
-import { setCurrentAvatar, setCurrentAvatarCrop, setCurrentLorebook, state } from "./state.js";
+import { setCurrentAvatar, setCurrentAvatarCrop, setCurrentAvatarImageType, setCurrentLorebook, state } from "./state.js";
 import { renderBotWithLorebookWorkspace } from "./workspaceCombined.js";
 
 let fileTypeStatus = null;
@@ -26,8 +26,13 @@ export function handleFile(file) {
     return;
   }
 
+  if (isPlainAvatarImage(extension)) {
+    inspectAvatarImageFile(file);
+    return;
+  }
+
   if (extension !== "json") {
-    fileTypeStatus.textContent = "Unsupported file type";
+    fileTypeStatus.textContent = "Unsupported file type. Use JSON, PNG card, or PNG/JPG/WebP avatar image.";
     return;
   }
 
@@ -35,6 +40,7 @@ export function handleFile(file) {
 
   reader.onload = () => {
     setCurrentAvatar(null);
+    setCurrentAvatarImageType();
     setCurrentAvatarCrop();
     inspectJsonFile(reader.result);
   };
@@ -59,6 +65,7 @@ function inspectJsonFile(fileText) {
 
   const card = normalizeToV2Card(parsed);
   renderBotWithLorebookWorkspace(card);
+  scrollToWorkspace();
 
   return;
 }
@@ -66,6 +73,7 @@ function inspectJsonFile(fileText) {
   if (type === "bot") {
     fileTypeStatus.textContent = "Detected: Bot";
     renderCardEditor(normalizeToV2Card(parsed));
+    scrollToWorkspace();
     return;
   }
 
@@ -75,6 +83,7 @@ function inspectJsonFile(fileText) {
   const lorebook = normalizeLorebook(parsed);
   setCurrentLorebook(lorebook);
   renderLorebookEditor(lorebook, { mode: "standalone" });
+  scrollToWorkspace();
 
   return;
  }
@@ -86,6 +95,7 @@ async function inspectPngFile(file) {
   try {
     const avatarDataUrl = await fileToDataUrl(file);
     setCurrentAvatar(avatarDataUrl);
+    setCurrentAvatarImageType(await inferAvatarImageType(avatarDataUrl));
     setCurrentAvatarCrop();
 
     const buffer = await file.arrayBuffer();
@@ -95,11 +105,12 @@ async function inspectPngFile(file) {
       fileTypeStatus.textContent = "PNG loaded as avatar, no card data found";
 
       if (!state.currentCard) {
-        renderCardEditor(createDefaultCard());
+        renderCardEditor(createDefaultCard(), { openAvatarCropper: true });
       } else {
-        renderCardEditor(state.currentCard);
+        renderCardEditor(state.currentCard, { openAvatarCropper: true });
       }
 
+      scrollToWorkspace();
       return;
     }
 
@@ -111,6 +122,7 @@ async function inspectPngFile(file) {
 
   const card = normalizeToV2Card(parsed);
   renderBotWithLorebookWorkspace(card);
+  scrollToWorkspace();
 
   return;
   }
@@ -118,6 +130,7 @@ async function inspectPngFile(file) {
     if (type === "bot") {
       fileTypeStatus.textContent = "Detected PNG: Bot";
       renderCardEditor(normalizeToV2Card(parsed));
+      scrollToWorkspace();
       return;
     }
 
@@ -126,6 +139,40 @@ async function inspectPngFile(file) {
     console.error(error);
     fileTypeStatus.textContent = "Could not read PNG card";
   }
+}
+
+async function inspectAvatarImageFile(file) {
+  try {
+    const avatarDataUrl = await fileToDataUrl(file);
+    setCurrentAvatar(avatarDataUrl);
+    setCurrentAvatarImageType(await inferAvatarImageType(avatarDataUrl));
+    setCurrentAvatarCrop();
+
+    if (!state.currentCard) {
+      renderCardEditor(createDefaultCard(), { openAvatarCropper: true });
+    } else {
+      renderCardEditor(state.currentCard, { openAvatarCropper: true });
+    }
+
+    fileTypeStatus.textContent = "Image loaded as avatar";
+    scrollToWorkspace();
+  } catch (error) {
+    console.error(error);
+    fileTypeStatus.textContent = "Could not read avatar image";
+  }
+}
+
+function isPlainAvatarImage(extension) {
+  return ["jpg", "jpeg", "webp"].includes(extension);
+}
+
+function scrollToWorkspace() {
+  requestAnimationFrame(() => {
+    workspaceTitle?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  });
 }
 
 function isV2Card(json) {
@@ -220,3 +267,4 @@ function normalizeLorebook(json) {
     entries: Array.isArray(lorebook.entries) ? lorebook.entries : []
   };
 }
+

@@ -3,6 +3,7 @@ export const state = {
   currentCard: null,
   currentLorebook: null,
   currentAvatarDataUrl: null,
+  currentAvatarImageType: "square",
   currentAvatarCrop: {
     x: 0.5,
     y: 0.5,
@@ -24,6 +25,10 @@ export function setCurrentProjectType(type) {
 
 export function setCurrentAvatar(dataUrl) {
   state.currentAvatarDataUrl = dataUrl;
+}
+
+export function setCurrentAvatarImageType(type) {
+  state.currentAvatarImageType = type === "portrait" ? "portrait" : "square";
 }
 
 export function setCurrentAvatarCrop(crop) {
@@ -64,6 +69,7 @@ export function saveDraftQuietly() {
     card: state.currentCard,
     lorebook: state.currentLorebook,
     avatarDataUrl: state.currentAvatarDataUrl,
+    avatarImageType: state.currentAvatarImageType,
     avatarCrop: state.currentAvatarCrop
   };
 
@@ -98,6 +104,7 @@ export function loadSavedDraft() {
       state.currentCard = parsed.card || null;
       state.currentLorebook = parsed.lorebook || null;
       state.currentAvatarDataUrl = parsed.avatarDataUrl || null;
+      setCurrentAvatarImageType(parsed.avatarImageType);
       setCurrentAvatarCrop(parsed.avatarCrop);
       return;
     }
@@ -107,6 +114,7 @@ export function loadSavedDraft() {
       state.currentCard = parsed;
       state.currentLorebook = parsed?.data?.character_book || null;
       state.currentAvatarDataUrl = null;
+      setCurrentAvatarImageType();
       setCurrentAvatarCrop();
     }
   } catch {
@@ -119,5 +127,6 @@ export function clearCurrentProject() {
   state.currentCard = null;
   state.currentLorebook = null;
   state.currentAvatarDataUrl = null;
+  setCurrentAvatarImageType();
   setCurrentAvatarCrop();
 }

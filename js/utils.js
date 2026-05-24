@@ -35,6 +35,11 @@ export function loadImage(src) {
   });
 }
 
+export async function inferAvatarImageType(dataUrl) {
+  const image = await loadImage(dataUrl);
+  return image.naturalHeight > image.naturalWidth ? "portrait" : "square";
+}
+
 export function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
 
@@ -135,6 +140,22 @@ export function base64ToUtf8(base64) {
 ================================ */
 
 export const MAX_AVATAR_ZOOM = 4;
+export const AVATAR_OUTPUTS = {
+  square: {
+    width: 512,
+    height: 512,
+    aspect: 1
+  },
+  portrait: {
+    width: 512,
+    height: 768,
+    aspect: 2 / 3
+  }
+};
+
+export function getAvatarOutput(type) {
+  return AVATAR_OUTPUTS[type === "portrait" ? "portrait" : "square"];
+}
 
 export function clampCrop01(value) {
   const number = Number(value);
@@ -149,19 +170,31 @@ export function clampZoom(value) {
 }
 
 // crop = { x: 0..1, y: 0..1, zoom: 1..MAX }
-//  - zoom 1 => square side equals the smaller image dimension (classic center/cover crop)
-//  - zoom n => square side shrinks to minDim / n (zoomed in)
-//  - x / y position that square within the leftover slack (0 = top/left, 1 = bottom/right)
-export function computeCropRect(naturalWidth, naturalHeight, crop) {
+//  - zoom 1 => largest crop of the selected output shape inside the image
+//  - zoom n => crop window shrinks from that base rectangle (zoomed in)
+//  - x / y position that crop window within leftover slack (0 = top/left, 1 = bottom/right)
+export function computeCropRect(naturalWidth, naturalHeight, crop, imageType = "square") {
   const zoom = clampZoom(crop?.zoom);
   const x = clampCrop01(crop?.x);
   const y = clampCrop01(crop?.y);
+  const targetAspect = getAvatarOutput(imageType).aspect;
+  const naturalAspect = naturalWidth / naturalHeight;
 
-  const minDim = Math.min(naturalWidth, naturalHeight);
-  const side = minDim / zoom;
+  let baseWidth;
+  let baseHeight;
 
-  const sx = (naturalWidth - side) * x;
-  const sy = (naturalHeight - side) * y;
+  if (naturalAspect >= targetAspect) {
+    baseHeight = naturalHeight;
+    baseWidth = baseHeight * targetAspect;
+  } else {
+    baseWidth = naturalWidth;
+    baseHeight = baseWidth / targetAspect;
+  }
 
-  return { sx, sy, side, zoom, x, y };
+  const sw = baseWidth / zoom;
+  const sh = baseHeight / zoom;
+  const sx = (naturalWidth - sw) * x;
+  const sy = (naturalHeight - sh) * y;
+
+  return { sx, sy, sw, sh, zoom, x, y };
 }

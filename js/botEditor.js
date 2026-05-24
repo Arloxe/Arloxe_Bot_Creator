@@ -1,14 +1,16 @@
 import {
   saveDraftQuietly,
   setCurrentAvatar,
+  setCurrentAvatarImageType,
   setCurrentAvatarCrop,
   setCurrentCard,
   setCurrentProjectType,
   state
 } from "./state.js";
 
-import { escapeHtml, fileToDataUrl } from "./utils.js";
+import { escapeHtml, fileToDataUrl, inferAvatarImageType } from "./utils.js";
 import { applyCropToImage, openAvatarCropper } from "./avatarCropper.js";
+import { confirmAction } from "./confirmDialog.js";
 
 let workspacePanel = null;
 let workspaceTitle = null;
@@ -43,7 +45,7 @@ export function renderCardEditor(card, options = {}) {
     <form class="editor-form" id="cardEditorForm">
       <div class="editor-section avatar-section">
         <div class="section-title">
-          <span>🖼️</span>
+          <span class="ui-icon ui-icon-image" aria-hidden="true"></span>
           <div>
             <h3>Avatar</h3>
             <p>This image becomes the visible PNG card when exporting as PNG.</p>
@@ -52,7 +54,7 @@ export function renderCardEditor(card, options = {}) {
 
         <div class="avatar-editor">
           <div
-            class="avatar-preview ${state.currentAvatarDataUrl ? "is-editable" : ""}"
+            class="avatar-preview ${state.currentAvatarImageType === "portrait" ? "is-portrait" : ""} ${state.currentAvatarDataUrl ? "is-editable" : ""}"
             id="avatarPreview"
             ${state.currentAvatarDataUrl ? 'role="button" tabindex="0" aria-label="Reposition avatar crop"' : ""}
           >
@@ -61,7 +63,7 @@ export function renderCardEditor(card, options = {}) {
                 ? `<img src="${state.currentAvatarDataUrl}" alt="Character avatar preview" id="avatarPreviewImage" draggable="false" />
                    <span class="avatar-preview-hint">Click to reposition</span>`
                 : `<div class="avatar-placeholder">
-                    <span>🌿</span>
+                    <span class="ui-icon ui-icon-image" aria-hidden="true"></span>
                     <strong>No avatar yet</strong>
                     <small>Upload an image to export PNG cards.</small>
                   </div>`
@@ -78,17 +80,26 @@ export function renderCardEditor(card, options = {}) {
             ${
               state.currentAvatarDataUrl
                 ? `<button class="secondary-button" type="button" id="editCropButton">
+                    <span class="button-icon ui-icon ui-icon-edit" aria-hidden="true"></span>
                     Reposition
                   </button>`
                 : ""
             }
 
             <button class="secondary-button" type="button" id="clearAvatarButton">
-              Clear Avatar
+              Remove Avatar
             </button>
 
+            <label class="avatar-type-control">
+              <span>Image Type</span>
+              <select id="avatarImageTypeSelect">
+                <option value="square" ${state.currentAvatarImageType !== "portrait" ? "selected" : ""}>Square</option>
+                <option value="portrait" ${state.currentAvatarImageType === "portrait" ? "selected" : ""}>Portrait</option>
+              </select>
+            </label>
+
             <p>
-              The exported PNG card is square. Click the preview (or “Reposition”) to drag and zoom which part of a portrait or wide image becomes the square card image.
+              Choose Square or Portrait output. Click the preview (or “Reposition”) to drag and zoom which part of the source image becomes the card image.
             </p>
           </div>
         </div>
@@ -96,7 +107,7 @@ export function renderCardEditor(card, options = {}) {
 
       <div class="editor-section">
         <div class="section-title">
-          <span>🧍</span>
+          <span class="ui-icon ui-icon-user" aria-hidden="true"></span>
           <div>
             <h3>Basic Character Info</h3>
             <p>The core identity fields for Character Card V2.</p>
@@ -131,7 +142,7 @@ export function renderCardEditor(card, options = {}) {
 
       <div class="editor-section">
         <div class="section-title">
-          <span>🧠</span>
+          <span class="ui-icon ui-icon-persona" aria-hidden="true"></span>
           <div>
             <h3>Persona</h3>
             <p>The meat and magic of the character.</p>
@@ -158,7 +169,7 @@ export function renderCardEditor(card, options = {}) {
 
       <div class="editor-section">
         <div class="section-title">
-          <span>💬</span>
+          <span class="ui-icon ui-icon-message" aria-hidden="true"></span>
           <div>
             <h3>Messages</h3>
             <p>Greeting and example dialogue.</p>
@@ -180,7 +191,7 @@ export function renderCardEditor(card, options = {}) {
 
       <div class="editor-section">
         <div class="section-title">
-          <span>🎭</span>
+          <span class="ui-icon ui-icon-greetings" aria-hidden="true"></span>
           <div>
             <h3>Alternate Greetings</h3>
             <p>Add extra openings for SillyTavern/Chub-style multi-greeting cards.</p>
@@ -196,7 +207,7 @@ export function renderCardEditor(card, options = {}) {
 
       <div class="editor-section">
         <div class="section-title">
-          <span>⚙️</span>
+          <span class="ui-icon ui-icon-settings" aria-hidden="true"></span>
           <div>
             <h3>Advanced Prompt Fields</h3>
             <p>Optional steering text for models and frontends that support it.</p>
@@ -223,7 +234,7 @@ export function renderCardEditor(card, options = {}) {
 
       <div class="editor-section">
         <div class="section-title">
-          <span>📝</span>
+          <span class="ui-icon ui-icon-character-note" aria-hidden="true"></span>
           <div>
             <h3>Character's Note</h3>
             <p>A depth-injected steering prompt. Inserted x messages deep into the chat history (x = depth), so it stays close to the model's attention. Stored in <code>extensions.depth_prompt</code> for SillyTavern/Chub. Leave the note empty to omit it from the card.</p>
@@ -261,6 +272,10 @@ export function renderCardEditor(card, options = {}) {
   wireDepthPromptEvents();
   wireTagEvents();
   wireAvatarEvents();
+
+  if (options.openAvatarCropper && state.currentAvatarDataUrl) {
+    requestAnimationFrame(runAvatarCropper);
+  }
 }
 
 function ensureEditorMount(mountId = "editorMount") {
@@ -305,7 +320,7 @@ function renderAlternateGreetings() {
   if (greetings.length === 0) {
     list.innerHTML = `
       <div class="mini-empty-state">
-        <span>🌱</span>
+        <span class="ui-icon ui-icon-greetings" aria-hidden="true"></span>
         <p>No alternate greetings yet.</p>
       </div>
     `;
@@ -336,11 +351,18 @@ function renderAlternateGreetings() {
   }).join("");
 
   list.querySelectorAll("[data-remove-greeting]").forEach((button) => {
-    button.addEventListener("click", (event) => {
+    button.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
 
       const index = Number(button.dataset.removeGreeting);
+      const shouldRemove = await confirmAction({
+        title: "Remove alternate greeting?",
+        message: "This greeting will be removed from the current character.",
+        confirmLabel: "Remove"
+      });
+      if (!shouldRemove) return;
+
       state.currentCard.data.alternate_greetings.splice(index, 1);
       renderAlternateGreetings();
       saveDraftQuietly();
@@ -538,6 +560,7 @@ function wireAvatarEvents() {
   const clearAvatarButton = document.getElementById("clearAvatarButton");
   const editCropButton = document.getElementById("editCropButton");
   const preview = document.getElementById("avatarPreview");
+  const avatarImageTypeSelect = document.getElementById("avatarImageTypeSelect");
 
   // Lay the preview image out to match the current crop.
   applyPreviewCrop();
@@ -546,14 +569,31 @@ function wireAvatarEvents() {
     avatarInput.click();
   });
 
-  clearAvatarButton?.addEventListener("click", () => {
+  clearAvatarButton?.addEventListener("click", async () => {
+    const shouldClear = await confirmAction({
+      title: "Remove avatar?",
+      message: "The current avatar image and crop settings will be removed from this character.",
+      confirmLabel: "Remove Avatar"
+    });
+    if (!shouldClear) return;
+
     setCurrentAvatar(null);
+    setCurrentAvatarImageType();
     setCurrentAvatarCrop();
     saveDraftQuietly();
     renderCardEditor(state.currentCard);
   });
 
   editCropButton?.addEventListener("click", runAvatarCropper);
+
+  avatarImageTypeSelect?.addEventListener("change", () => {
+    setCurrentAvatarImageType(avatarImageTypeSelect.value);
+    setCurrentAvatarCrop();
+    saveDraftQuietly();
+    renderCardEditor(state.currentCard, {
+      openAvatarCropper: Boolean(state.currentAvatarDataUrl)
+    });
+  });
 
   if (preview && state.currentAvatarDataUrl) {
     preview.addEventListener("click", runAvatarCropper);
@@ -571,6 +611,7 @@ function wireAvatarEvents() {
 
     const dataUrl = await fileToDataUrl(file);
     setCurrentAvatar(dataUrl);
+    setCurrentAvatarImageType(await inferAvatarImageType(dataUrl));
     setCurrentAvatarCrop();
 
     saveDraftQuietly();
@@ -588,7 +629,8 @@ async function runAvatarCropper() {
 
   const result = await openAvatarCropper(
     state.currentAvatarDataUrl,
-    state.currentAvatarCrop
+    state.currentAvatarCrop,
+    state.currentAvatarImageType
   );
 
   if (result) {
@@ -603,7 +645,13 @@ function applyPreviewCrop() {
   const image = document.getElementById("avatarPreviewImage");
   if (!box || !image) return;
 
-  const run = () => applyCropToImage(image, box.clientWidth || 220, state.currentAvatarCrop);
+  const run = () => applyCropToImage(
+    image,
+    box.clientWidth || 220,
+    box.clientHeight || box.clientWidth || 220,
+    state.currentAvatarCrop,
+    state.currentAvatarImageType
+  );
 
   if (image.complete && image.naturalWidth) {
     run();
