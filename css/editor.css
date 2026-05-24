@@ -120,6 +120,174 @@ html[data-theme="light"] .form-field textarea:focus {
   background: rgba(255, 255, 255, 0.85);
 }
 
+/* Native <select>: match the inputs instead of falling back to a flat OS box. */
+.form-field select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.8rem 2.4rem 0.8rem 0.9rem;
+
+  color: var(--text);
+  background-color: rgba(0, 0, 0, 0.18);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--accent) 50%),
+    linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+  background-repeat: no-repeat;
+  background-position:
+    calc(100% - 1.05rem) 50%,
+    calc(100% - 0.75rem) 50%;
+  background-size:
+    0.34rem 0.34rem,
+    0.34rem 0.34rem;
+
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  line-height: 1.55;
+  cursor: pointer;
+  outline: none;
+  color-scheme: dark;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.form-field select:hover {
+  border-color: var(--accent);
+}
+
+.form-field select:focus {
+  border-color: var(--accent);
+  background-color: rgba(0, 0, 0, 0.24);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+html[data-theme="light"] .form-field select {
+  background-color: rgba(255, 255, 255, 0.55);
+  color-scheme: light;
+}
+
+html[data-theme="light"] .form-field select:focus {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.form-field select option {
+  color: var(--text);
+  background-color: var(--bg-soft);
+}
+
+/* ================================
+   Tag Chips
+================================ */
+
+.tag-chip-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(203, 164, 73, 0.18);
+  border-radius: var(--radius-md);
+
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+html[data-theme="light"] .tag-chip-input {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.tag-chip-input:hover {
+  border-color: rgba(203, 164, 73, 0.36);
+}
+
+.tag-chip-input:focus-within {
+  border-color: var(--accent);
+  background: rgba(0, 0, 0, 0.24);
+  box-shadow: 0 0 0 4px rgba(203, 164, 73, 0.08);
+}
+
+html[data-theme="light"] .tag-chip-input:focus-within {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Let the chips flow as flex items directly inside the container. */
+.tag-chip-list {
+  display: contents;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  padding: 0.25rem 0.3rem 0.25rem 0.65rem;
+
+  color: var(--text);
+  background: var(--accent-soft);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+
+  font-size: 0.86rem;
+  line-height: 1.2;
+}
+
+.tag-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+  padding: 0;
+
+  color: var(--text-muted);
+  background: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.tag-chip-remove:hover {
+  color: var(--text);
+  background: rgba(208, 106, 106, 0.22);
+}
+
+.tag-chip-input .tag-add-input {
+  flex: 1 1 140px;
+  min-width: 120px;
+  width: auto;
+
+  padding: 0.3rem 0.35rem;
+
+  color: var(--text);
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.tag-chip-input .tag-add-input:hover,
+.tag-chip-input .tag-add-input:focus {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
 /* ================================
    Alternate Greetings
 ================================ */

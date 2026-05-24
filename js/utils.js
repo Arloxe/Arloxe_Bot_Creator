@@ -127,3 +127,41 @@ export function base64ToUtf8(base64) {
 
   return new TextDecoder().decode(bytes);
 }
+
+/* ================================
+   Avatar crop geometry
+   Shared by the export (pngCards.js), the live preview, and the cropper modal
+   so all three agree on exactly which square region of the source is used.
+================================ */
+
+export const MAX_AVATAR_ZOOM = 4;
+
+export function clampCrop01(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 0.5;
+  return Math.min(1, Math.max(0, number));
+}
+
+export function clampZoom(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 1;
+  return Math.min(MAX_AVATAR_ZOOM, Math.max(1, number));
+}
+
+// crop = { x: 0..1, y: 0..1, zoom: 1..MAX }
+//  - zoom 1 => square side equals the smaller image dimension (classic center/cover crop)
+//  - zoom n => square side shrinks to minDim / n (zoomed in)
+//  - x / y position that square within the leftover slack (0 = top/left, 1 = bottom/right)
+export function computeCropRect(naturalWidth, naturalHeight, crop) {
+  const zoom = clampZoom(crop?.zoom);
+  const x = clampCrop01(crop?.x);
+  const y = clampCrop01(crop?.y);
+
+  const minDim = Math.min(naturalWidth, naturalHeight);
+  const side = minDim / zoom;
+
+  const sx = (naturalWidth - side) * x;
+  const sy = (naturalHeight - side) * y;
+
+  return { sx, sy, side, zoom, x, y };
+}

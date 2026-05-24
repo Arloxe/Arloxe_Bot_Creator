@@ -4,6 +4,7 @@ import {
   base64ToUtf8,
   bytesToAscii,
   bytesToLatin1,
+  computeCropRect,
   latin1ToBytes,
   loadImage,
   readUint32,
@@ -82,16 +83,18 @@ async function createAvatarPngBlob() {
 
   const image = await loadImage(state.currentAvatarDataUrl);
 
-  const sourceSize = Math.min(image.width, image.height);
-  const sx = (image.width - sourceSize) / 2;
-  const sy = (image.height - sourceSize) / 2;
+  const { sx, sy, side } = computeCropRect(
+    image.width,
+    image.height,
+    state.currentAvatarCrop
+  );
 
   ctx.drawImage(
     image,
     sx,
     sy,
-    sourceSize,
-    sourceSize,
+    side,
+    side,
     0,
     0,
     size,

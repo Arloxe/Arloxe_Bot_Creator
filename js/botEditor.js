@@ -1,12 +1,14 @@
 import {
   saveDraftQuietly,
   setCurrentAvatar,
+  setCurrentAvatarCrop,
   setCurrentCard,
   setCurrentProjectType,
   state
 } from "./state.js";
 
 import { escapeHtml, fileToDataUrl } from "./utils.js";
+import { applyCropToImage, openAvatarCropper } from "./avatarCropper.js";
 
 let workspacePanel = null;
 let workspaceTitle = null;
@@ -49,10 +51,15 @@ export function renderCardEditor(card, options = {}) {
         </div>
 
         <div class="avatar-editor">
-          <div class="avatar-preview" id="avatarPreview">
+          <div
+            class="avatar-preview ${state.currentAvatarDataUrl ? "is-editable" : ""}"
+            id="avatarPreview"
+            ${state.currentAvatarDataUrl ? 'role="button" tabindex="0" aria-label="Reposition avatar crop"' : ""}
+          >
             ${
               state.currentAvatarDataUrl
-                ? `<img src="${state.currentAvatarDataUrl}" alt="Character avatar preview" />`
+                ? `<img src="${state.currentAvatarDataUrl}" alt="Character avatar preview" id="avatarPreviewImage" draggable="false" />
+                   <span class="avatar-preview-hint">Click to reposition</span>`
                 : `<div class="avatar-placeholder">
                     <span>🌿</span>
                     <strong>No avatar yet</strong>
@@ -68,12 +75,20 @@ export function renderCardEditor(card, options = {}) {
               Choose Avatar
             </button>
 
+            ${
+              state.currentAvatarDataUrl
+                ? `<button class="secondary-button" type="button" id="editCropButton">
+                    Reposition
+                  </button>`
+                : ""
+            }
+
             <button class="secondary-button" type="button" id="clearAvatarButton">
               Clear Avatar
             </button>
 
             <p>
-              Recommended: square image, PNG or JPG. The exporter crops it into a clean square card image.
+              The exported PNG card is square. Click the preview (or “Reposition”) to drag and zoom which part of a portrait or wide image becomes the square card image.
             </p>
           </div>
         </div>
@@ -104,10 +119,13 @@ export function renderCardEditor(card, options = {}) {
             <input type="text" data-card-field="character_version" value="${escapeHtml(fieldValue(card.data.character_version))}" placeholder="1.0" />
           </label>
 
-          <label class="form-field">
+          <div class="form-field">
             <span>Tags</span>
-            <input type="text" data-card-field="tags" value="${escapeHtml((card.data.tags || []).join(", "))}" placeholder="AnyPOV, fantasy, romance" />
-          </label>
+            <div class="tag-chip-input" id="tagChipInput">
+              <div class="tag-chip-list" id="tagChipList"></div>
+              <input type="text" id="tagAddInput" class="tag-add-input" placeholder="Add a tag, press Enter" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -241,6 +259,7 @@ export function renderCardEditor(card, options = {}) {
   renderAlternateGreetings();
   wireCardEditorEvents();
   wireDepthPromptEvents();
+  wireTagEvents();
   wireAvatarEvents();
 }
 
@@ -368,6 +387,96 @@ function wireCardEditorEvents() {
   });
 }
 
+function renderTagChips() {
+  const list = document.getElementById("tagChipList");
+  if (!list || !state.currentCard) return;
+
+  const tags = state.currentCard.data.tags || [];
+
+  list.innerHTML = tags
+    .map(
+      (tag, index) => `
+      <span class="tag-chip">
+        <span class="tag-chip-label">${escapeHtml(tag)}</span>
+        <button type="button" class="tag-chip-remove" data-remove-tag="${index}" aria-label="Remove tag ${escapeHtml(tag)}">×</button>
+      </span>
+    `
+    )
+    .join("");
+
+  list.querySelectorAll("[data-remove-tag]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const index = Number(button.dataset.removeTag);
+      state.currentCard.data.tags.splice(index, 1);
+      renderTagChips();
+      saveDraftQuietly();
+    });
+  });
+}
+
+function addTagsFromString(value) {
+  if (!state.currentCard) return;
+
+  state.currentCard.data.tags = state.currentCard.data.tags || [];
+
+  // Splitting on comma lets a pasted "a, b, c" become three chips at once.
+  const incoming = value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+
+  for (const tag of incoming) {
+    const isDuplicate = state.currentCard.data.tags.some(
+      (existing) => existing.toLowerCase() === tag.toLowerCase()
+    );
+
+    if (!isDuplicate) {
+      state.currentCard.data.tags.push(tag);
+    }
+  }
+}
+
+function wireTagEvents() {
+  const input = document.getElementById("tagAddInput");
+  if (!input) return;
+
+  const commit = () => {
+    if (!input.value.trim()) return;
+
+    addTagsFromString(input.value);
+    input.value = "";
+    renderTagChips();
+    saveDraftQuietly();
+  };
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === ",") {
+      event.preventDefault();
+      commit();
+      return;
+    }
+
+    // Backspace on an empty input removes the last chip, like most tag editors.
+    if (event.key === "Backspace" && input.value === "") {
+      const tags = state.currentCard?.data?.tags;
+
+      if (tags && tags.length) {
+        tags.pop();
+        renderTagChips();
+        saveDraftQuietly();
+      }
+    }
+  });
+
+  // Don't lose a tag the user typed but didn't press Enter on.
+  input.addEventListener("blur", commit);
+
+  renderTagChips();
+}
+
 function wireDepthPromptEvents() {
   const form = document.getElementById("cardEditorForm");
 
@@ -414,15 +523,6 @@ function updateCardFromField(input) {
 
   const field = input.dataset.cardField;
 
-  if (field === "tags") {
-    state.currentCard.data.tags = input.value
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean);
-
-    return;
-  }
-
   state.currentCard.data[field] = input.value;
 
   if (field === "name") {
@@ -436,6 +536,11 @@ function wireAvatarEvents() {
   const avatarInput = document.getElementById("avatarInput");
   const chooseAvatarButton = document.getElementById("chooseAvatarButton");
   const clearAvatarButton = document.getElementById("clearAvatarButton");
+  const editCropButton = document.getElementById("editCropButton");
+  const preview = document.getElementById("avatarPreview");
+
+  // Lay the preview image out to match the current crop.
+  applyPreviewCrop();
 
   chooseAvatarButton?.addEventListener("click", () => {
     avatarInput.click();
@@ -443,9 +548,22 @@ function wireAvatarEvents() {
 
   clearAvatarButton?.addEventListener("click", () => {
     setCurrentAvatar(null);
+    setCurrentAvatarCrop();
     saveDraftQuietly();
     renderCardEditor(state.currentCard);
   });
+
+  editCropButton?.addEventListener("click", runAvatarCropper);
+
+  if (preview && state.currentAvatarDataUrl) {
+    preview.addEventListener("click", runAvatarCropper);
+    preview.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        runAvatarCropper();
+      }
+    });
+  }
 
   avatarInput?.addEventListener("change", async (event) => {
     const file = event.target.files[0];
@@ -453,8 +571,43 @@ function wireAvatarEvents() {
 
     const dataUrl = await fileToDataUrl(file);
     setCurrentAvatar(dataUrl);
+    setCurrentAvatarCrop();
 
     saveDraftQuietly();
     renderCardEditor(state.currentCard);
+
+    // Auto-open the cropper so the user can frame the freshly chosen image.
+    runAvatarCropper();
   });
+}
+
+// Opens the cropper for the current avatar and persists the chosen crop.
+// Shared by the preview click, the Reposition button, and avatar upload/change.
+async function runAvatarCropper() {
+  if (!state.currentAvatarDataUrl) return;
+
+  const result = await openAvatarCropper(
+    state.currentAvatarDataUrl,
+    state.currentAvatarCrop
+  );
+
+  if (result) {
+    setCurrentAvatarCrop(result);
+    applyPreviewCrop();
+    saveDraftQuietly();
+  }
+}
+
+function applyPreviewCrop() {
+  const box = document.getElementById("avatarPreview");
+  const image = document.getElementById("avatarPreviewImage");
+  if (!box || !image) return;
+
+  const run = () => applyCropToImage(image, box.clientWidth || 220, state.currentAvatarCrop);
+
+  if (image.complete && image.naturalWidth) {
+    run();
+  } else {
+    image.addEventListener("load", run, { once: true });
+  }
 }

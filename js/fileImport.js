@@ -3,7 +3,7 @@ import { renderLorebookEditor } from "./lorebookEditor.js";
 import { createDefaultCard } from "./templates.js";
 import { clone, fileToDataUrl } from "./utils.js";
 import { extractCardJsonFromPng } from "./pngCards.js";
-import { setCurrentAvatar, setCurrentLorebook, state } from "./state.js";
+import { setCurrentAvatar, setCurrentAvatarCrop, setCurrentLorebook, state } from "./state.js";
 import { renderBotWithLorebookWorkspace } from "./workspaceCombined.js";
 
 let fileTypeStatus = null;
@@ -35,6 +35,7 @@ export function handleFile(file) {
 
   reader.onload = () => {
     setCurrentAvatar(null);
+    setCurrentAvatarCrop();
     inspectJsonFile(reader.result);
   };
 
@@ -85,6 +86,7 @@ async function inspectPngFile(file) {
   try {
     const avatarDataUrl = await fileToDataUrl(file);
     setCurrentAvatar(avatarDataUrl);
+    setCurrentAvatarCrop();
 
     const buffer = await file.arrayBuffer();
     const cardJson = extractCardJsonFromPng(buffer);

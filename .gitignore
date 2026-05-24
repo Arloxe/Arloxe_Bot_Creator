@@ -1,0 +1,9 @@
+# Local-only dev/testing tools
+run-local.bat
+assets/test.png
+
+# OS / editor cruft
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
