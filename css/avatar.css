@@ -24,10 +24,40 @@
 }
 
 .avatar-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
   display: block;
+
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.avatar-preview.is-editable {
+  cursor: pointer;
+}
+
+.avatar-preview-hint {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+
+  padding: 0.4rem 0.6rem;
+
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-align: center;
+  color: var(--text);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.avatar-preview.is-editable:hover .avatar-preview-hint,
+.avatar-preview.is-editable:focus-visible .avatar-preview-hint {
+  opacity: 1;
 }
 
 .avatar-placeholder {
@@ -81,4 +111,155 @@
   .avatar-preview {
     width: min(100%, 320px);
   }
+}
+
+/* ================================
+   Avatar Cropper Modal
+================================ */
+
+.avatar-cropper[hidden] {
+  display: none;
+}
+
+.avatar-cropper {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.avatar-cropper-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(4px);
+}
+
+.avatar-cropper-dialog {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  width: min(440px, 100%);
+  padding: 1.25rem;
+
+  background: var(--panel-strong);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.avatar-cropper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.avatar-cropper-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.avatar-cropper-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.avatar-cropper-stage {
+  position: relative;
+  width: min(78vw, 360px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.45);
+  touch-action: none;
+  cursor: grab;
+}
+
+.avatar-cropper-stage:active {
+  cursor: grabbing;
+}
+
+.avatar-cropper-stage img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  display: block;
+
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Rule-of-thirds overlay, non-interactive. */
+.avatar-cropper-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28)),
+    linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28)),
+    linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28)),
+    linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28));
+  background-repeat: no-repeat;
+  background-size:
+    100% 1px,
+    100% 1px,
+    1px 100%,
+    1px 100%;
+  background-position:
+    0 33.33%,
+    0 66.66%,
+    33.33% 0,
+    66.66% 0;
+
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.avatar-cropper-zoom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.avatar-cropper-zoom input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.avatar-cropper-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.avatar-cropper-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+body.modal-open {
+  overflow: hidden;
 }

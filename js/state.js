@@ -2,7 +2,12 @@ export const state = {
   currentProjectType: null,
   currentCard: null,
   currentLorebook: null,
-  currentAvatarDataUrl: null
+  currentAvatarDataUrl: null,
+  currentAvatarCrop: {
+    x: 0.5,
+    y: 0.5,
+    zoom: 1
+  }
 };
 
 export function setCurrentCard(card) {
@@ -21,6 +26,36 @@ export function setCurrentAvatar(dataUrl) {
   state.currentAvatarDataUrl = dataUrl;
 }
 
+export function setCurrentAvatarCrop(crop) {
+  state.currentAvatarCrop = {
+    x: clampCropValue(crop?.x),
+    y: clampCropValue(crop?.y),
+    zoom: clampZoomValue(crop?.zoom)
+  };
+}
+
+function clampCropValue(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return 0.5;
+  }
+
+  return Math.min(1, Math.max(0, number));
+}
+
+// Kept in sync with MAX_AVATAR_ZOOM in utils.js (duplicated here to avoid a
+// circular import, since utils.js already imports from state.js).
+function clampZoomValue(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return 1;
+  }
+
+  return Math.min(4, Math.max(1, number));
+}
+
 export function saveDraftQuietly() {
   if (!state.currentCard && !state.currentLorebook) return;
 
@@ -28,7 +63,8 @@ export function saveDraftQuietly() {
     projectType: state.currentProjectType,
     card: state.currentCard,
     lorebook: state.currentLorebook,
-    avatarDataUrl: state.currentAvatarDataUrl
+    avatarDataUrl: state.currentAvatarDataUrl,
+    avatarCrop: state.currentAvatarCrop
   };
 
   localStorage.setItem("arloxe-current-card", JSON.stringify(draft));
@@ -62,6 +98,7 @@ export function loadSavedDraft() {
       state.currentCard = parsed.card || null;
       state.currentLorebook = parsed.lorebook || null;
       state.currentAvatarDataUrl = parsed.avatarDataUrl || null;
+      setCurrentAvatarCrop(parsed.avatarCrop);
       return;
     }
 
@@ -70,6 +107,7 @@ export function loadSavedDraft() {
       state.currentCard = parsed;
       state.currentLorebook = parsed?.data?.character_book || null;
       state.currentAvatarDataUrl = null;
+      setCurrentAvatarCrop();
     }
   } catch {
     localStorage.removeItem("arloxe-current-card");
@@ -81,4 +119,5 @@ export function clearCurrentProject() {
   state.currentCard = null;
   state.currentLorebook = null;
   state.currentAvatarDataUrl = null;
+  setCurrentAvatarCrop();
 }

@@ -1,0 +1,54 @@
+<div
+  class="avatar-cropper"
+  id="avatarCropper"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Reposition avatar crop"
+  aria-hidden="true"
+  hidden
+>
+  <div class="avatar-cropper-backdrop" data-cropper-close></div>
+
+  <div class="avatar-cropper-dialog" role="document">
+    <div class="avatar-cropper-header">
+      <h3>Reposition Avatar</h3>
+      <button
+        class="icon-button"
+        type="button"
+        data-cropper-close
+        aria-label="Close cropper"
+      >
+        ×
+      </button>
+    </div>
+
+    <p class="avatar-cropper-hint">
+      Drag the image to choose which part fills the square card. Use the slider to zoom.
+    </p>
+
+    <div class="avatar-cropper-stage" id="avatarCropperStage">
+      <img id="avatarCropperImage" alt="Avatar being cropped" draggable="false" />
+      <div class="avatar-cropper-grid" aria-hidden="true"></div>
+    </div>
+
+    <label class="avatar-cropper-zoom">
+      <span>Zoom</span>
+      <input type="range" id="avatarCropperZoom" min="100" max="400" value="100" />
+    </label>
+
+    <div class="avatar-cropper-actions">
+      <button class="secondary-button" type="button" id="avatarCropperReset">
+        Center
+      </button>
+
+      <div class="avatar-cropper-actions-right">
+        <button class="secondary-button" type="button" data-cropper-close>
+          Cancel
+        </button>
+        <button class="primary-button" type="button" id="avatarCropperApply">
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

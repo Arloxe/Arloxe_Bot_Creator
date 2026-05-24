@@ -1,12 +1,14 @@
 import {
   saveDraftQuietly,
   setCurrentAvatar,
+  setCurrentAvatarCrop,
   setCurrentCard,
   setCurrentProjectType,
   state
 } from "./state.js";
 
 import { escapeHtml, fileToDataUrl } from "./utils.js";
+import { applyCropToImage, openAvatarCropper } from "./avatarCropper.js";
 
 let workspacePanel = null;
 let workspaceTitle = null;
@@ -49,10 +51,15 @@ export function renderCardEditor(card, options = {}) {
         </div>
 
         <div class="avatar-editor">
-          <div class="avatar-preview" id="avatarPreview">
+          <div
+            class="avatar-preview ${state.currentAvatarDataUrl ? "is-editable" : ""}"
+            id="avatarPreview"
+            ${state.currentAvatarDataUrl ? 'role="button" tabindex="0" aria-label="Reposition avatar crop"' : ""}
+          >
             ${
               state.currentAvatarDataUrl
-                ? `<img src="${state.currentAvatarDataUrl}" alt="Character avatar preview" />`
+                ? `<img src="${state.currentAvatarDataUrl}" alt="Character avatar preview" id="avatarPreviewImage" draggable="false" />
+                   <span class="avatar-preview-hint">Click to reposition</span>`
                 : `<div class="avatar-placeholder">
                     <span>🌿</span>
                     <strong>No avatar yet</strong>
@@ -68,12 +75,20 @@ export function renderCardEditor(card, options = {}) {
               Choose Avatar
             </button>
 
+            ${
+              state.currentAvatarDataUrl
+                ? `<button class="secondary-button" type="button" id="editCropButton">
+                    Reposition
+                  </button>`
+                : ""
+            }
+
             <button class="secondary-button" type="button" id="clearAvatarButton">
               Clear Avatar
             </button>
 
             <p>
-              Recommended: square image, PNG or JPG. The exporter crops it into a clean square card image.
+              The exported PNG card is square. Click the preview (or “Reposition”) to drag and zoom which part of a portrait or wide image becomes the square card image.
             </p>
           </div>
         </div>
@@ -521,6 +536,11 @@ function wireAvatarEvents() {
   const avatarInput = document.getElementById("avatarInput");
   const chooseAvatarButton = document.getElementById("chooseAvatarButton");
   const clearAvatarButton = document.getElementById("clearAvatarButton");
+  const editCropButton = document.getElementById("editCropButton");
+  const preview = document.getElementById("avatarPreview");
+
+  // Lay the preview image out to match the current crop.
+  applyPreviewCrop();
 
   chooseAvatarButton?.addEventListener("click", () => {
     avatarInput.click();
@@ -528,9 +548,22 @@ function wireAvatarEvents() {
 
   clearAvatarButton?.addEventListener("click", () => {
     setCurrentAvatar(null);
+    setCurrentAvatarCrop();
     saveDraftQuietly();
     renderCardEditor(state.currentCard);
   });
+
+  editCropButton?.addEventListener("click", runAvatarCropper);
+
+  if (preview && state.currentAvatarDataUrl) {
+    preview.addEventListener("click", runAvatarCropper);
+    preview.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        runAvatarCropper();
+      }
+    });
+  }
 
   avatarInput?.addEventListener("change", async (event) => {
     const file = event.target.files[0];
@@ -538,8 +571,43 @@ function wireAvatarEvents() {
 
     const dataUrl = await fileToDataUrl(file);
     setCurrentAvatar(dataUrl);
+    setCurrentAvatarCrop();
 
     saveDraftQuietly();
     renderCardEditor(state.currentCard);
+
+    // Auto-open the cropper so the user can frame the freshly chosen image.
+    runAvatarCropper();
   });
+}
+
+// Opens the cropper for the current avatar and persists the chosen crop.
+// Shared by the preview click, the Reposition button, and avatar upload/change.
+async function runAvatarCropper() {
+  if (!state.currentAvatarDataUrl) return;
+
+  const result = await openAvatarCropper(
+    state.currentAvatarDataUrl,
+    state.currentAvatarCrop
+  );
+
+  if (result) {
+    setCurrentAvatarCrop(result);
+    applyPreviewCrop();
+    saveDraftQuietly();
+  }
+}
+
+function applyPreviewCrop() {
+  const box = document.getElementById("avatarPreview");
+  const image = document.getElementById("avatarPreviewImage");
+  if (!box || !image) return;
+
+  const run = () => applyCropToImage(image, box.clientWidth || 220, state.currentAvatarCrop);
+
+  if (image.complete && image.naturalWidth) {
+    run();
+  } else {
+    image.addEventListener("load", run, { once: true });
+  }
 }
