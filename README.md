@@ -24,7 +24,7 @@ It is designed for creators who make Character Card V2 bots for platforms and to
 
 Arloxe Card Forge runs directly in your browser.
 
-Imported cards, avatars, lorebooks, and drafts are handled locally unless you choose to export and upload them somewhere yourself.
+Imported cards, avatars, lorebooks, presets, and drafts are handled locally unless you choose to export and upload them somewhere yourself.
 
 The GitHub Pages version does not use a backend database and does not store uploaded files on a server.
 
@@ -32,9 +32,10 @@ The GitHub Pages version does not use a backend database and does not store uplo
 
 Currently supported:
 
-- Character Card V2 `.json`
+- Character Card V2 `.json` (With support for Character's Note)
 - PNG character cards with embedded `chara` metadata
 - Standalone lorebook `.json`
+- Standalone preset `.json`
 - Character cards with embedded `character_book` data
 
 Compatibility may vary between platforms, since different tools can use extra fields or custom extensions.
@@ -53,32 +54,38 @@ assets/
   favicon.png
   main_icon.png
   banner_image.png
+  - icons (for on-site icons)
 
 css/
+  avatar.css
   base.css
-  layout.css
   components.css
   editor.css
-  avatar.css
-  pages.css
   footer.css
+  layout.css
+  pages.css
+  style.css
 
 js/
   app.js
-  staticPage.js
-  partials.js
-  state.js
-  templates.js
+  avatarCropper.js
   botEditor.js
-  lorebookEditor.js
-  workspaceCombined.js
-  fileImport.js
+  confirmDialog.js
   fileExport.js
+  fileImport.js
+  lorebookEditor.js
+  partials.js
   pngCards.js
+  presetEditor.js
+  state.js
+  staticPage.js
+  templates.js
   utils.js
+  workspaceCombined.js
 
 partials/
   app-header.html
+  footer.html
+  image_preview_fragment.html
   index-header.html
   info-header.html
-  footer.html
