@@ -2,6 +2,7 @@ export const state = {
   currentProjectType: null,
   currentCard: null,
   currentLorebook: null,
+  currentPreset: null,
   currentAvatarDataUrl: null,
   currentAvatarImageType: "square",
   currentAvatarCrop: {
@@ -17,6 +18,10 @@ export function setCurrentCard(card) {
 
 export function setCurrentLorebook(lorebook) {
   state.currentLorebook = lorebook;
+}
+
+export function setCurrentPreset(preset) {
+  state.currentPreset = preset;
 }
 
 export function setCurrentProjectType(type) {
@@ -62,12 +67,13 @@ function clampZoomValue(value) {
 }
 
 export function saveDraftQuietly() {
-  if (!state.currentCard && !state.currentLorebook) return;
+  if (!state.currentCard && !state.currentLorebook && !state.currentPreset) return;
 
   const draft = {
     projectType: state.currentProjectType,
     card: state.currentCard,
     lorebook: state.currentLorebook,
+    preset: state.currentPreset,
     avatarDataUrl: state.currentAvatarDataUrl,
     avatarImageType: state.currentAvatarImageType,
     avatarCrop: state.currentAvatarCrop
@@ -77,7 +83,7 @@ export function saveDraftQuietly() {
 }
 
 export function saveDraft() {
-  if (!state.currentCard && !state.currentLorebook) {
+  if (!state.currentCard && !state.currentLorebook && !state.currentPreset) {
     return {
       success: false,
       message: "Nothing to save"
@@ -99,10 +105,11 @@ export function loadSavedDraft() {
   try {
     const parsed = JSON.parse(saved);
 
-    if (parsed?.card || parsed?.lorebook) {
+    if (parsed?.card || parsed?.lorebook || parsed?.preset) {
       state.currentProjectType = parsed.projectType || null;
       state.currentCard = parsed.card || null;
       state.currentLorebook = parsed.lorebook || null;
+      state.currentPreset = parsed.preset || null;
       state.currentAvatarDataUrl = parsed.avatarDataUrl || null;
       setCurrentAvatarImageType(parsed.avatarImageType);
       setCurrentAvatarCrop(parsed.avatarCrop);
@@ -126,6 +133,7 @@ export function clearCurrentProject() {
   state.currentProjectType = null;
   state.currentCard = null;
   state.currentLorebook = null;
+  state.currentPreset = null;
   state.currentAvatarDataUrl = null;
   setCurrentAvatarImageType();
   setCurrentAvatarCrop();

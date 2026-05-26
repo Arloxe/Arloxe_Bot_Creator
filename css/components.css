@@ -549,6 +549,21 @@ html[data-theme="light"] .nav-action {
   font-weight: 800;
 }
 
+.hero-image-badge {
+  overflow: visible;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.hero-image-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* ================================
    Action Cards
 ================================ */
@@ -606,6 +621,29 @@ html[data-theme="light"] .nav-action {
   margin: 0.5rem 0 0;
   color: var(--text-muted);
   line-height: 1.5;
+}
+
+.hub-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.hub-card {
+  min-height: 168px;
+  padding: 0.95rem;
+}
+
+.hub-card .card-icon {
+  width: 42px;
+  height: 42px;
+}
+
+.hub-card h3 {
+  font-size: 1rem;
+}
+
+.hub-card p {
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 /* ================================
@@ -984,10 +1022,13 @@ html[data-theme="light"] .setting-row {
 .nav-icon.ui-icon-book,
 .card-icon.ui-icon-combined,
 .nav-icon.ui-icon-combined,
+.card-icon.ui-icon-preset,
+.nav-icon.ui-icon-preset,
 .section-title .ui-icon-image,
 .section-title .ui-icon-persona,
 .section-title .ui-icon-message,
 .section-title .ui-icon-book,
+.section-title .ui-icon-preset,
 .section-title .ui-icon-settings {
   color: transparent;
   background-color: transparent;
@@ -1010,6 +1051,11 @@ html[data-theme="light"] .setting-row {
 .card-icon.ui-icon-combined,
 .nav-icon.ui-icon-combined {
   background-image: url("../assets/icons/new_lorebook_bot_default.png");
+}
+.card-icon.ui-icon-preset,
+.nav-icon.ui-icon-preset,
+.section-title .ui-icon-preset {
+  background-image: url("../assets/icons/preset_dark_default.png");
 }
 .section-title .ui-icon-image {
   background-image: url("../assets/icons/avatar_default.png");
@@ -1041,6 +1087,11 @@ html[data-accent="soft-gold"] .card-icon.ui-icon-combined,
 html[data-accent="soft-gold"] .nav-icon.ui-icon-combined {
   background-image: url("../assets/icons/new_lorebook_bot_gold.png");
 }
+html[data-accent="soft-gold"] .card-icon.ui-icon-preset,
+html[data-accent="soft-gold"] .nav-icon.ui-icon-preset,
+html[data-accent="soft-gold"] .section-title .ui-icon-preset {
+  background-image: url("../assets/icons/preset_dark_gold.png");
+}
 html[data-accent="soft-gold"] .section-title .ui-icon-image {
   background-image: url("../assets/icons/avatar_gold.png");
 }
@@ -1071,6 +1122,11 @@ html[data-accent="deep-green"] .card-icon.ui-icon-combined,
 html[data-accent="deep-green"] .nav-icon.ui-icon-combined {
   background-image: url("../assets/icons/new_lorebook_bot_green.png");
 }
+html[data-accent="deep-green"] .card-icon.ui-icon-preset,
+html[data-accent="deep-green"] .nav-icon.ui-icon-preset,
+html[data-accent="deep-green"] .section-title .ui-icon-preset {
+  background-image: url("../assets/icons/preset_dark_green.png");
+}
 html[data-accent="deep-green"] .section-title .ui-icon-image {
   background-image: url("../assets/icons/avatar_green.png");
 }
@@ -1093,6 +1149,7 @@ html[data-accent="deep-green"] .section-title .ui-icon-settings {
 .button-icon.ui-icon-edit,
 .theme-icon.ui-icon-open-editor,
 .theme-icon.ui-icon-theme,
+.drop-icon.ui-icon-upload,
 .section-title .ui-icon-character-note,
 .section-title .ui-icon-greetings,
 .mini-empty-state .ui-icon-greetings,
@@ -1118,6 +1175,9 @@ html[data-accent="deep-green"] .section-title .ui-icon-settings {
 }
 .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_dark_default.png");
+}
+.drop-icon.ui-icon-upload {
+  background-image: url("../assets/icons/Upload_Dark_Default.png");
 }
 .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_dark_default.png");
@@ -1146,6 +1206,9 @@ html[data-accent="soft-gold"] .theme-icon.ui-icon-open-editor {
 html[data-accent="soft-gold"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_dark_gold.png");
 }
+html[data-accent="soft-gold"] .drop-icon.ui-icon-upload {
+  background-image: url("../assets/icons/Upload_Dark_Gold.png");
+}
 html[data-accent="soft-gold"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_dark_gold.png");
 }
@@ -1173,6 +1236,9 @@ html[data-accent="deep-green"] .theme-icon.ui-icon-open-editor {
 html[data-accent="deep-green"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_dark_green.png");
 }
+html[data-accent="deep-green"] .drop-icon.ui-icon-upload {
+  background-image: url("../assets/icons/Upload_Dark_Green.png");
+}
 html[data-accent="deep-green"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_dark_green.png");
 }
@@ -1191,6 +1257,11 @@ html[data-theme="light"] .card-icon.ui-icon-edit-existing,
 html[data-theme="light"] .nav-icon.ui-icon-edit-existing {
   background-image: url("../assets/icons/edit_existing_card_light_default.png");
 }
+html[data-theme="light"] .card-icon.ui-icon-preset,
+html[data-theme="light"] .nav-icon.ui-icon-preset,
+html[data-theme="light"] .section-title .ui-icon-preset {
+  background-image: url("../assets/icons/preset_light_default.png");
+}
 html[data-theme="light"] .button-icon.ui-icon-edit {
   background-image: url("../assets/icons/edit_light_default.png");
 }
@@ -1199,6 +1270,9 @@ html[data-theme="light"] .theme-icon.ui-icon-open-editor {
 }
 html[data-theme="light"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_light_default.png");
+}
+html[data-theme="light"] .drop-icon.ui-icon-upload {
+  background-image: url("../assets/icons/Upload_Light_Default.png");
 }
 html[data-theme="light"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_light_default.png");
@@ -1218,6 +1292,11 @@ html[data-theme="light"][data-accent="soft-gold"] .card-icon.ui-icon-edit-existi
 html[data-theme="light"][data-accent="soft-gold"] .nav-icon.ui-icon-edit-existing {
   background-image: url("../assets/icons/edit_existing_card_light_gold.png");
 }
+html[data-theme="light"][data-accent="soft-gold"] .card-icon.ui-icon-preset,
+html[data-theme="light"][data-accent="soft-gold"] .nav-icon.ui-icon-preset,
+html[data-theme="light"][data-accent="soft-gold"] .section-title .ui-icon-preset {
+  background-image: url("../assets/icons/preset_light_gold.png");
+}
 html[data-theme="light"][data-accent="soft-gold"] .button-icon.ui-icon-edit {
   background-image: url("../assets/icons/edit_light_gold.png");
 }
@@ -1226,6 +1305,9 @@ html[data-theme="light"][data-accent="soft-gold"] .theme-icon.ui-icon-open-edito
 }
 html[data-theme="light"][data-accent="soft-gold"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_light_gold.png");
+}
+html[data-theme="light"][data-accent="soft-gold"] .drop-icon.ui-icon-upload {
+  background-image: url("../assets/icons/Upload_Light_Gold.png");
 }
 html[data-theme="light"][data-accent="soft-gold"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_light_gold.png");
@@ -1245,6 +1327,11 @@ html[data-theme="light"][data-accent="deep-green"] .card-icon.ui-icon-edit-exist
 html[data-theme="light"][data-accent="deep-green"] .nav-icon.ui-icon-edit-existing {
   background-image: url("../assets/icons/edit_existing_card_light_green.png");
 }
+html[data-theme="light"][data-accent="deep-green"] .card-icon.ui-icon-preset,
+html[data-theme="light"][data-accent="deep-green"] .nav-icon.ui-icon-preset,
+html[data-theme="light"][data-accent="deep-green"] .section-title .ui-icon-preset {
+  background-image: url("../assets/icons/preset_light_green.png");
+}
 html[data-theme="light"][data-accent="deep-green"] .button-icon.ui-icon-edit {
   background-image: url("../assets/icons/edit_light_green.png");
 }
@@ -1253,6 +1340,9 @@ html[data-theme="light"][data-accent="deep-green"] .theme-icon.ui-icon-open-edit
 }
 html[data-theme="light"][data-accent="deep-green"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_light_green.png");
+}
+html[data-theme="light"][data-accent="deep-green"] .drop-icon.ui-icon-upload {
+  background-image: url("../assets/icons/Upload_Light_Green.png");
 }
 html[data-theme="light"][data-accent="deep-green"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_light_green.png");
@@ -1291,11 +1381,7 @@ html[data-accent="deep-green"] .settings-button {
 }
 
 /* ================================
-   Drop-zone illustration
-   Arloxe's drop_your_file_here_*.png is a full illustration (heading + sub-text
-   baked in). Show it in place of the glyph + text, keep the "Choose File"
-   button, and drop the box's own border so it doesn't double up with the
-   illustration's baked dashed border (an accent ring still appears on hover).
+   Drop-zone
 ================================ */
 
 .drop-zone {
@@ -1307,36 +1393,12 @@ html[data-theme="light"] .drop-zone {
   background: none;
 }
 
-.drop-zone .drop-icon,
-.drop-zone h3,
-.drop-zone p {
-  display: none;
-}
-
-/* With the text hidden, the grid's place-items:center would shrink the
-   content to the button width; give it a definite width so the illustration
-   sizes off the drop-zone, not the button. */
 .drop-zone-content {
   width: 100%;
 }
 
-.drop-zone-content::before {
-  content: "";
-  display: block;
-  width: min(100%, 440px);
-  aspect-ratio: 1448 / 1086;
-  margin: 0 auto 1rem;
-
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  background-image: url("../assets/icons/drop_your_file_here_default.png");
-}
-
-html[data-accent="soft-gold"] .drop-zone-content::before {
-  background-image: url("../assets/icons/drop_your_file_here_gold.png");
-}
-
-html[data-accent="deep-green"] .drop-zone-content::before {
-  background-image: url("../assets/icons/drop_your_file_here_green.png");
+.drop-zone .drop-icon {
+  width: 86px;
+  height: 86px;
+  margin-bottom: 0.35rem;
 }

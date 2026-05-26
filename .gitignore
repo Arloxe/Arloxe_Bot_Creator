@@ -6,6 +6,7 @@ assets/character_without_lorebook_example.json
 assets/lorebook_example.json
 assets/character_with_lorebook_example.png
 assets/character_without_lorebook_example.png
+assets/preset_example.json
 
 # Heavy source icons (optimized copies live in assets/icons/ and ARE committed)
 assets/icon_src/

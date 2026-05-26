@@ -60,6 +60,14 @@
           </span>
         </button>
 
+        <button class="nav-action" type="button" data-action="new-template">
+          <span class="nav-icon ui-icon ui-icon-preset" aria-hidden="true"></span>
+          <span>
+            <strong>Create a New Template</strong>
+            <small>Start a blank prompt preset/template.</small>
+          </span>
+        </button>
+
         <button class="nav-action" type="button" data-action="edit-file">
           <span class="nav-icon ui-icon ui-icon-edit-existing" aria-hidden="true"></span>
           <span>
@@ -89,32 +97,6 @@
   </a>
 </section>
 
-      <section class="action-grid" aria-label="Creation options">
-        <button class="action-card" type="button" data-action="new-bot">
-          <span class="card-icon ui-icon ui-icon-user" aria-hidden="true"></span>
-          <h3>Create a New Bot</h3>
-          <p>Start with a fresh Character Card V2 template.</p>
-        </button>
-
-        <button class="action-card" type="button" data-action="new-lorebook">
-          <span class="card-icon ui-icon ui-icon-book" aria-hidden="true"></span>
-          <h3>Create a New Lorebook</h3>
-          <p>Make standalone lore entries, keywords, and world info.</p>
-        </button>
-
-        <button class="action-card" type="button" data-action="new-bot-lorebook">
-          <span class="card-icon ui-icon ui-icon-combined" aria-hidden="true"></span>
-          <h3>Bot + Lorebook</h3>
-          <p>Create a character and connect lorebook entries side by side.</p>
-        </button>
-
-        <button class="action-card" type="button" data-action="edit-file">
-          <span class="card-icon ui-icon ui-icon-edit-existing" aria-hidden="true"></span>
-          <h3>Edit Existing File</h3>
-          <p>Drop in a JSON or supported card file and let the forge inspect it.</p>
-        </button>
-      </section>
-
       <section class="panel" id="editPanel">
         <div class="panel-header">
           <div>
@@ -138,7 +120,7 @@
             <h3>Drop your file here</h3>
             <p>
               Or click to browse. The forge will try to detect whether it is
-              a bot, lorebook, bot with lorebook, or avatar image.
+              a bot, lorebook, preset, bot with lorebook, or avatar image.
             </p>
 
             <button class="primary-button" type="button" id="browseFileButton">
@@ -157,7 +139,7 @@
 
           <div class="panel-actions">
             <button class="secondary-button danger-outline-button" type="button" id="clearProjectButton">
-              Clear Character
+              Clear Project
             </button>
 
             <button class="secondary-button" type="button" id="saveDraftButton">
@@ -174,7 +156,7 @@
           <span class="ui-icon ui-icon-note" aria-hidden="true"></span>
           <h3>Your editor will appear here.</h3>
           <p>
-            Pick a creation option or import a file to start shaping your character goblin.
+            Pick a creation option or import a file to start shaping your project.
           </p>
         </div>
       </section>

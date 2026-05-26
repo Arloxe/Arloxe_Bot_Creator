@@ -1,9 +1,10 @@
 ﻿import { renderCardEditor } from "./botEditor.js";
 import { renderLorebookEditor } from "./lorebookEditor.js";
+import { renderPresetEditor } from "./presetEditor.js";
 import { createDefaultCard } from "./templates.js";
 import { clone, fileToDataUrl, inferAvatarImageType } from "./utils.js";
 import { extractCardJsonFromPng } from "./pngCards.js";
-import { setCurrentAvatar, setCurrentAvatarCrop, setCurrentAvatarImageType, setCurrentLorebook, state } from "./state.js";
+import { setCurrentAvatar, setCurrentAvatarCrop, setCurrentAvatarImageType, setCurrentCard, setCurrentLorebook, setCurrentPreset, state } from "./state.js";
 import { renderBotWithLorebookWorkspace } from "./workspaceCombined.js";
 
 let fileTypeStatus = null;
@@ -32,7 +33,7 @@ export function handleFile(file) {
   }
 
   if (extension !== "json") {
-    fileTypeStatus.textContent = "Unsupported file type. Use JSON, PNG card, or PNG/JPG/WebP avatar image.";
+    fileTypeStatus.textContent = "Unsupported file type. Use JSON preset/card/lorebook, PNG card, or PNG/JPG/WebP avatar image.";
     return;
   }
 
@@ -63,6 +64,7 @@ function inspectJsonFile(fileText) {
   if (type === "bot-with-lorebook") {
   fileTypeStatus.textContent = "Detected: Bot with Lorebook";
 
+  setCurrentPreset(null);
   const card = normalizeToV2Card(parsed);
   renderBotWithLorebookWorkspace(card);
   scrollToWorkspace();
@@ -72,6 +74,8 @@ function inspectJsonFile(fileText) {
 
   if (type === "bot") {
     fileTypeStatus.textContent = "Detected: Bot";
+    setCurrentLorebook(null);
+    setCurrentPreset(null);
     renderCardEditor(normalizeToV2Card(parsed));
     scrollToWorkspace();
     return;
@@ -80,6 +84,8 @@ function inspectJsonFile(fileText) {
   if (type === "lorebook") {
   fileTypeStatus.textContent = "Detected: Lorebook";
 
+  setCurrentCard(null);
+  setCurrentPreset(null);
   const lorebook = normalizeLorebook(parsed);
   setCurrentLorebook(lorebook);
   renderLorebookEditor(lorebook, { mode: "standalone" });
@@ -87,6 +93,17 @@ function inspectJsonFile(fileText) {
 
   return;
  }
+
+  if (type === "preset") {
+    fileTypeStatus.textContent = "Detected: Preset";
+
+    setCurrentCard(null);
+    setCurrentLorebook(null);
+    renderPresetEditor(normalizePreset(parsed));
+    scrollToWorkspace();
+
+    return;
+  }
 
   fileTypeStatus.textContent = "Unknown JSON type";
 }
@@ -120,6 +137,7 @@ async function inspectPngFile(file) {
     if (type === "bot-with-lorebook") {
   fileTypeStatus.textContent = "Detected PNG: Bot with Lorebook";
 
+  setCurrentPreset(null);
   const card = normalizeToV2Card(parsed);
   renderBotWithLorebookWorkspace(card);
   scrollToWorkspace();
@@ -129,6 +147,8 @@ async function inspectPngFile(file) {
 
     if (type === "bot") {
       fileTypeStatus.textContent = "Detected PNG: Bot";
+      setCurrentLorebook(null);
+      setCurrentPreset(null);
       renderCardEditor(normalizeToV2Card(parsed));
       scrollToWorkspace();
       return;
@@ -230,12 +250,32 @@ function isRecord(value) {
 export function detectFileType(json) {
   const card = looksLikeCard(json);
   const lorebook = looksLikeLorebook(json);
+  const preset = looksLikePreset(json);
 
   if (card && lorebook) return "bot-with-lorebook";
   if (card) return "bot";
   if (lorebook) return "lorebook";
+  if (preset) return "preset";
 
   return "unknown";
+}
+
+function looksLikePreset(json) {
+  if (!json || typeof json !== "object") return false;
+
+  return Boolean(
+    Array.isArray(json.prompts) ||
+    Array.isArray(json.prompt_order) ||
+    (
+      "temperature" in json &&
+      (
+        "top_p" in json ||
+        "top_k" in json ||
+        "openai_max_context" in json ||
+        "impersonation_prompt" in json
+      )
+    )
+  );
 }
 
 export function normalizeToV2Card(json) {
@@ -338,5 +378,30 @@ function normalizeLorebookEntries(entries) {
     position: entry.position || "before_char",
     extensions: entry.extensions || {}
   }));
+}
+
+export function normalizePreset(json) {
+  const preset = clone(json || {});
+
+  preset.prompts = Array.isArray(preset.prompts) ? preset.prompts : [];
+  preset.prompt_order = Array.isArray(preset.prompt_order) ? preset.prompt_order : [];
+  preset.extensions = preset.extensions || {};
+
+  preset.prompts = preset.prompts.map((prompt, index) => ({
+    ...prompt,
+    id: prompt.id || prompt.identifier || `prompt-${index + 1}`,
+    identifier: prompt.identifier || prompt.id || `prompt-${index + 1}`,
+    name: prompt.name || prompt.identifier || `Prompt ${index + 1}`,
+    role: prompt.role || "user",
+    content: prompt.content || "",
+    enabled: prompt.enabled ?? true,
+    system_prompt: Boolean(prompt.system_prompt),
+    marker: Boolean(prompt.marker),
+    injection_position: Number(prompt.injection_position ?? 0),
+    injection_depth: Number(prompt.injection_depth ?? 4),
+    forbid_overrides: Boolean(prompt.forbid_overrides)
+  }));
+
+  return preset;
 }
 

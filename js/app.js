@@ -2,8 +2,9 @@ import { loadPartials } from "./partials.js";
 import { renderCardEditor, setupBotEditor } from "./botEditor.js";
 import { exportCurrentCardJson, exportCurrentCardPng, setupFileExport } from "./fileExport.js";
 import { handleFile, setupFileImport } from "./fileImport.js";
-import { createDefaultCard, createDefaultLorebook } from "./templates.js";
+import { createDefaultCard, createDefaultLorebook, createDefaultPreset } from "./templates.js";
 import { renderLorebookEditor, setupLorebookEditor } from "./lorebookEditor.js";
+import { renderPresetEditor, setupPresetEditor } from "./presetEditor.js";
 import {
   clearCurrentProject,
   loadSavedDraft,
@@ -11,7 +12,9 @@ import {
   setCurrentAvatar,
   setCurrentAvatarImageType,
   setCurrentAvatarCrop,
+  setCurrentCard,
   setCurrentLorebook,
+  setCurrentPreset,
   state
 } from "./state.js";
 
@@ -47,6 +50,7 @@ const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const browseFileButton = document.getElementById("browseFileButton");
 const fileTypeStatus = document.getElementById("fileTypeStatus");
+const editPanel = document.getElementById("editPanel");
 
 const workspacePanel = document.getElementById("workspacePanel");
 const workspaceTitle = document.getElementById("workspaceTitle");
@@ -75,6 +79,12 @@ setupCombinedWorkspace({
 });
 
 setupLorebookEditor({
+  workspacePanel,
+  workspaceTitle,
+  emptyState
+});
+
+setupPresetEditor({
   workspacePanel,
   workspaceTitle,
   emptyState
@@ -164,6 +174,12 @@ function resetWorkspaceView() {
   emptyState.style.display = "";
 }
 
+function setEditPanelVisible(isVisible) {
+  if (editPanel) {
+    editPanel.hidden = !isVisible;
+  }
+}
+
 /* ================================
    Actions
 ================================ */
@@ -176,12 +192,16 @@ function setActiveAction(action) {
 
 function handleAction(action) {
   setActiveAction(action);
+  setEditPanelVisible(action === "edit-file");
 
   if (action === "new-bot") {
     document.getElementById("editorMount")?.remove();
     setCurrentAvatar(null);
     setCurrentAvatarImageType();
     setCurrentAvatarCrop();
+    setCurrentCard(null);
+    setCurrentLorebook(null);
+    setCurrentPreset(null);
     renderCardEditor(createDefaultCard());
     fileTypeStatus.textContent = "New bot created";
     scrollToWorkspace();
@@ -194,6 +214,9 @@ function handleAction(action) {
   setCurrentAvatar(null);
   setCurrentAvatarImageType();
   setCurrentAvatarCrop();
+  setCurrentCard(null);
+  setCurrentLorebook(null);
+  setCurrentPreset(null);
 
   const card = createDefaultCard();
   card.data.character_book = createDefaultLorebook();
@@ -212,6 +235,8 @@ function handleAction(action) {
   setCurrentAvatar(null);
   setCurrentAvatarImageType();
   setCurrentAvatarCrop();
+  setCurrentCard(null);
+  setCurrentPreset(null);
   setCurrentLorebook(createDefaultLorebook());
 
   renderLorebookEditor(state.currentLorebook, { mode: "standalone" });
@@ -222,8 +247,27 @@ function handleAction(action) {
   return;
   }
 
+  if (action === "new-template") {
+    document.getElementById("editorMount")?.remove();
+    document.getElementById("exportPngButton")?.remove();
+    setCurrentAvatar(null);
+    setCurrentAvatarImageType();
+    setCurrentAvatarCrop();
+    setCurrentCard(null);
+    setCurrentLorebook(null);
+
+    const preset = createDefaultPreset();
+    setCurrentPreset(preset);
+    renderPresetEditor(preset, { projectType: "template", label: "Template" });
+
+    fileTypeStatus.textContent = "New template created";
+    scrollToWorkspace();
+    closeSidebar();
+    return;
+  }
+
   if (action === "edit-file") {
-    document.getElementById("editPanel")?.scrollIntoView({
+    editPanel?.scrollIntoView({
       behavior: "smooth",
       block: "start"
     });
@@ -250,6 +294,7 @@ function init() {
   initAccent();
 
   loadSavedDraft();
+  setEditPanelVisible(false);
 
   const route = window.location.hash.replace("#", "");
 
@@ -267,6 +312,16 @@ function init() {
   if (state.currentLorebook && state.currentProjectType === "lorebook") {
     renderLorebookEditor(state.currentLorebook, { mode: "standalone" });
     fileTypeStatus.textContent = "Loaded saved lorebook draft";
+    return;
+  }
+
+  if (state.currentPreset && (state.currentProjectType === "preset" || state.currentProjectType === "template")) {
+    const isTemplate = state.currentProjectType === "template";
+    renderPresetEditor(state.currentPreset, {
+      projectType: state.currentProjectType,
+      label: isTemplate ? "Template" : "Preset"
+    });
+    fileTypeStatus.textContent = isTemplate ? "Loaded saved template draft" : "Loaded saved preset draft";
     return;
   }
 
@@ -300,15 +355,15 @@ saveDraftButton?.addEventListener("click", () => {
 });
 
 clearProjectButton?.addEventListener("click", async () => {
-  if (!state.currentCard && !state.currentLorebook) {
+  if (!state.currentCard && !state.currentLorebook && !state.currentPreset) {
     fileTypeStatus.textContent = "Nothing to clear";
     return;
   }
 
   const shouldClear = await confirmAction({
-    title: "Clear current character?",
-    message: "This removes the open character, lorebook, avatar, and local draft from this browser.",
-    confirmLabel: "Clear Character"
+    title: "Clear current project?",
+    message: "This removes the open character, lorebook, preset, avatar, and local draft from this browser.",
+    confirmLabel: "Clear Project"
   });
 
   if (!shouldClear) return;
@@ -316,7 +371,7 @@ clearProjectButton?.addEventListener("click", async () => {
   clearCurrentProject();
   localStorage.removeItem("arloxe-current-card");
   resetWorkspaceView();
-  fileTypeStatus.textContent = "Character cleared";
+  fileTypeStatus.textContent = "Project cleared";
 });
 
 exportButton?.addEventListener("click", exportCurrentCardJson);
