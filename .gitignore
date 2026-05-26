@@ -1,6 +1,11 @@
 # Local-only dev/testing tools
 run-local.bat
 assets/test.png
+assets/character_with_lorebook_example.json
+assets/character_without_lorebook_example.json
+assets/lorebook_example.json
+assets/character_with_lorebook_example.png
+assets/character_without_lorebook_example.png
 
 # Heavy source icons (optimized copies live in assets/icons/ and ARE committed)
 assets/icon_src/

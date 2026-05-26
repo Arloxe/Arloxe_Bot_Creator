@@ -175,30 +175,59 @@ function scrollToWorkspace() {
   });
 }
 
+function isCharacterCardSpec(json) {
+  return typeof json?.spec === "string" && json.spec.startsWith("chara_card_v") && Boolean(json?.data);
+}
+
 function isV2Card(json) {
   return json?.spec === "chara_card_v2" && Boolean(json?.data);
 }
 
 function looksLikeCard(json) {
+  const data = json?.data;
+
   return Boolean(
-    isV2Card(json) ||
-    json?.data?.name ||
-    json?.data?.first_mes ||
-    json?.name ||
+    isCharacterCardSpec(json) ||
+    data?.first_mes ||
+    data?.first_message ||
+    data?.personality ||
+    data?.scenario ||
+    data?.mes_example ||
     json?.first_mes ||
-    json?.description
+    json?.first_message ||
+    json?.personality ||
+    json?.scenario ||
+    json?.mes_example
   );
 }
 
 function looksLikeLorebook(json) {
   return Boolean(
-    Array.isArray(json?.entries) ||
-    Array.isArray(json?.data?.character_book?.entries) ||
-    json?.data?.character_book
+    looksLikeLorebookObject(json) ||
+    looksLikeLorebookObject(json?.data?.character_book)
   );
 }
 
-function detectFileType(json) {
+function looksLikeLorebookObject(lorebook) {
+  if (!lorebook || typeof lorebook !== "object") return false;
+
+  return Boolean(
+    hasLorebookEntries(lorebook.entries) ||
+    "scan_depth" in lorebook ||
+    "token_budget" in lorebook ||
+    "recursive_scanning" in lorebook
+  );
+}
+
+function hasLorebookEntries(entries) {
+  return Array.isArray(entries) || isRecord(entries);
+}
+
+function isRecord(value) {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+export function detectFileType(json) {
   const card = looksLikeCard(json);
   const lorebook = looksLikeLorebook(json);
 
@@ -209,7 +238,7 @@ function detectFileType(json) {
   return "unknown";
 }
 
-function normalizeToV2Card(json) {
+export function normalizeToV2Card(json) {
   if (isV2Card(json)) {
     const card = clone(json);
 
@@ -227,34 +256,43 @@ function normalizeToV2Card(json) {
     return card;
   }
 
+  const source = isCharacterCardSpec(json)
+    ? json.data
+    : json;
+
   const card = createDefaultCard();
 
-  card.data.name = json?.name || "";
-  card.data.description = json?.description || "";
-  card.data.personality = json?.personality || "";
-  card.data.scenario = json?.scenario || "";
-  card.data.first_mes = json?.first_mes || json?.first_message || "";
-  card.data.mes_example = json?.mes_example || "";
+  card.data.name = source?.name || "";
+  card.data.description = source?.description || "";
+  card.data.personality = source?.personality || "";
+  card.data.scenario = source?.scenario || "";
+  card.data.first_mes = source?.first_mes || source?.first_message || "";
+  card.data.mes_example = source?.mes_example || "";
 
-  card.data.creator_notes = json?.creator_notes || "";
-  card.data.system_prompt = json?.system_prompt || "";
-  card.data.post_history_instructions = json?.post_history_instructions || "";
+  card.data.creator_notes = source?.creator_notes || source?.creatorcomment || "";
+  card.data.system_prompt = source?.system_prompt || "";
+  card.data.post_history_instructions = source?.post_history_instructions || "";
 
-  if (Array.isArray(json?.alternate_greetings)) {
-    card.data.alternate_greetings = json.alternate_greetings;
+  if (Array.isArray(source?.alternate_greetings)) {
+    card.data.alternate_greetings = source.alternate_greetings;
   }
 
-  if (Array.isArray(json?.tags)) {
-    card.data.tags = json.tags;
+  if (Array.isArray(source?.tags)) {
+    card.data.tags = source.tags;
   }
 
-  card.data.creator = json?.creator || "";
-  card.data.character_version = json?.character_version || "";
+  card.data.creator = source?.creator || "";
+  card.data.character_version = source?.character_version || "";
+  card.data.extensions = source?.extensions || {};
+
+  if (source?.character_book) {
+    card.data.character_book = normalizeLorebook(source.character_book);
+  }
 
   return card;
 }
 
-function normalizeLorebook(json) {
+export function normalizeLorebook(json) {
   const lorebook = json?.data?.character_book || json;
 
   return {
@@ -264,7 +302,41 @@ function normalizeLorebook(json) {
     token_budget: Number(lorebook.token_budget ?? 500),
     recursive_scanning: Boolean(lorebook.recursive_scanning),
     extensions: lorebook.extensions || {},
-    entries: Array.isArray(lorebook.entries) ? lorebook.entries : []
+    entries: normalizeLorebookEntries(lorebook.entries)
   };
+}
+
+function normalizeLorebookEntries(entries) {
+  const entryList = Array.isArray(entries)
+    ? entries
+    : isRecord(entries)
+      ? Object.values(entries)
+      : [];
+
+  return entryList.map((entry, index) => ({
+    ...entry,
+    keys: Array.isArray(entry.keys)
+      ? entry.keys
+      : Array.isArray(entry.key)
+        ? entry.key
+        : [],
+    secondary_keys: Array.isArray(entry.secondary_keys)
+      ? entry.secondary_keys
+      : Array.isArray(entry.keysecondary)
+        ? entry.keysecondary
+        : [],
+    content: entry.content || "",
+    enabled: entry.enabled ?? !entry.disable,
+    insertion_order: Number(entry.insertion_order ?? entry.order ?? 100),
+    case_sensitive: Boolean(entry.case_sensitive),
+    name: entry.name || entry.comment || `Entry ${index + 1}`,
+    priority: Number(entry.priority ?? entry.order ?? 100),
+    id: entry.id ?? entry.uid ?? Date.now() + index,
+    comment: entry.comment || "",
+    selective: Boolean(entry.selective),
+    constant: Boolean(entry.constant),
+    position: entry.position || "before_char",
+    extensions: entry.extensions || {}
+  }));
 }
 
