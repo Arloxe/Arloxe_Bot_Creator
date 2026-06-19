@@ -1177,7 +1177,7 @@ html[data-accent="deep-green"] .section-title .ui-icon-settings {
   background-image: url("../assets/icons/theme_dark_default.png");
 }
 .drop-icon.ui-icon-upload {
-  background-image: url("../assets/icons/Upload_Dark_Default.png");
+  background-image: url("../assets/icons/upload_dark_default.png");
 }
 .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_dark_default.png");
@@ -1207,7 +1207,7 @@ html[data-accent="soft-gold"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_dark_gold.png");
 }
 html[data-accent="soft-gold"] .drop-icon.ui-icon-upload {
-  background-image: url("../assets/icons/Upload_Dark_Gold.png");
+  background-image: url("../assets/icons/upload_dark_gold.png");
 }
 html[data-accent="soft-gold"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_dark_gold.png");
@@ -1237,7 +1237,7 @@ html[data-accent="deep-green"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_dark_green.png");
 }
 html[data-accent="deep-green"] .drop-icon.ui-icon-upload {
-  background-image: url("../assets/icons/Upload_Dark_Green.png");
+  background-image: url("../assets/icons/upload_dark_green.png");
 }
 html[data-accent="deep-green"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_dark_green.png");
@@ -1272,7 +1272,7 @@ html[data-theme="light"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_light_default.png");
 }
 html[data-theme="light"] .drop-icon.ui-icon-upload {
-  background-image: url("../assets/icons/Upload_Light_Default.png");
+  background-image: url("../assets/icons/upload_light_default.png");
 }
 html[data-theme="light"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_light_default.png");
@@ -1307,7 +1307,7 @@ html[data-theme="light"][data-accent="soft-gold"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_light_gold.png");
 }
 html[data-theme="light"][data-accent="soft-gold"] .drop-icon.ui-icon-upload {
-  background-image: url("../assets/icons/Upload_Light_Gold.png");
+  background-image: url("../assets/icons/upload_light_gold.png");
 }
 html[data-theme="light"][data-accent="soft-gold"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_light_gold.png");
@@ -1342,7 +1342,7 @@ html[data-theme="light"][data-accent="deep-green"] .theme-icon.ui-icon-theme {
   background-image: url("../assets/icons/theme_light_green.png");
 }
 html[data-theme="light"][data-accent="deep-green"] .drop-icon.ui-icon-upload {
-  background-image: url("../assets/icons/Upload_Light_Green.png");
+  background-image: url("../assets/icons/upload_light_green.png");
 }
 html[data-theme="light"][data-accent="deep-green"] .section-title .ui-icon-character-note {
   background-image: url("../assets/icons/character_note_light_green.png");

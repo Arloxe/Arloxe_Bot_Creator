@@ -960,3 +960,123 @@ html[data-theme="light"] .workspace-collapse {
 .workspace-collapse-body .editor-section:first-child {
   margin-top: 0;
 }
+
+/* ================================
+   Lorebook Cover Image
+   The illustrated cover sits in a square or portrait box. Clicking it opens
+   the same drag/zoom cropper used for the bot avatar; the inner <img> is
+   absolutely positioned so the cropper can transform it.
+================================ */
+
+.lorebook-cover-editor {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+
+.lorebook-cover-preview {
+  position: relative;
+  overflow: hidden;
+
+  width: 200px;
+  flex: 0 0 auto;
+
+  background:
+    radial-gradient(circle at 30% 20%, rgba(203, 164, 73, 0.24), transparent 38%),
+    linear-gradient(135deg, var(--green-soft), rgba(0, 0, 0, 0.18));
+  border: 1px solid rgba(203, 164, 73, 0.22);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.lorebook-cover-preview.lorebook-cover-portrait {
+  aspect-ratio: 2 / 3;
+}
+
+.lorebook-cover-preview.lorebook-cover-square {
+  aspect-ratio: 1 / 1;
+}
+
+.lorebook-cover-preview img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  display: block;
+
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lorebook-cover-preview.is-editable {
+  cursor: pointer;
+}
+
+.lorebook-cover-hint {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+
+  padding: 0.4rem 0.6rem;
+
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-align: center;
+  color: var(--text);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.lorebook-cover-preview.is-editable:hover .lorebook-cover-hint,
+.lorebook-cover-preview.is-editable:focus-visible .lorebook-cover-hint {
+  opacity: 1;
+}
+
+.lorebook-cover-placeholder {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.4rem;
+
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.lorebook-cover-placeholder strong {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.lorebook-cover-placeholder small {
+  max-width: 160px;
+  line-height: 1.4;
+}
+
+.lorebook-cover-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cover-image-type-field {
+  min-width: 160px;
+}
+
+@media (max-width: 760px) {
+  .lorebook-cover-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .lorebook-cover-preview {
+    width: min(100%, 240px);
+    margin: 0 auto;
+  }
+}

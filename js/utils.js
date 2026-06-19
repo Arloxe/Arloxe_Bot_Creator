@@ -198,3 +198,30 @@ export function computeCropRect(naturalWidth, naturalHeight, crop, imageType = "
 
   return { sx, sy, sw, sh, zoom, x, y };
 }
+
+// Downscale an image file/blob to fit within maxDim on the long edge
+// (preserving aspect) and return a PNG data URL. Used for lorebook covers
+// and similar uploads, to keep base64 inline storage under the localStorage
+// quota and to keep exported cards a reasonable size.
+export async function resizeImageToDataUrl(blob, maxDim = 768) {
+  const url = URL.createObjectURL(blob);
+  try {
+    const img = await loadImage(url);
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    if (!w || !h) throw new Error("Image has no usable dimensions.");
+
+    const scale = Math.min(1, maxDim / Math.max(w, h));
+    const tw = Math.max(1, Math.round(w * scale));
+    const th = Math.max(1, Math.round(h * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = tw;
+    canvas.height = th;
+    canvas.getContext("2d").drawImage(img, 0, 0, tw, th);
+
+    return canvas.toDataURL("image/png");
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}

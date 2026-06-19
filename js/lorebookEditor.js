@@ -7,7 +7,8 @@ import {
 
 import { createDefaultLorebookEntry } from "./templates.js";
 import { confirmAction } from "./confirmDialog.js";
-import { escapeHtml } from "./utils.js";
+import { applyCropToImage, openAvatarCropper } from "./avatarCropper.js";
+import { escapeHtml, inferAvatarImageType, resizeImageToDataUrl } from "./utils.js";
 
 let workspacePanel = null;
 let workspaceTitle = null;
@@ -36,8 +37,63 @@ export function renderLorebookEditor(lorebook, options = {}) {
 
   const mount = ensureEditorMount(mountId);
 
+  const cover = lorebook.extensions?.cover || null;
+  const coverShape = cover?.imageType === "square" ? "square" : "portrait";
+
   mount.innerHTML = `
     <form class="editor-form" id="lorebookEditorForm">
+      <div class="editor-section">
+        <div class="section-title">
+          <span class="ui-icon ui-icon-image" aria-hidden="true"></span>
+          <div>
+            <h3>Cover Image</h3>
+            <p>Optional visual identity for this lorebook. Click the preview to drag and zoom which part shows in the frame. Uploads are auto-resized to keep storage light.</p>
+          </div>
+        </div>
+
+        <div class="lorebook-cover-editor">
+          <div
+            class="lorebook-cover-preview lorebook-cover-${coverShape} ${cover?.data ? "is-editable" : ""}"
+            id="lorebookCoverPreview"
+            ${cover?.data ? 'role="button" tabindex="0" aria-label="Reposition cover crop"' : ""}
+          >
+            ${
+              cover?.data
+                ? `<img src="${cover.data}" alt="Lorebook cover preview" id="lorebookCoverImage" draggable="false" />
+                   <span class="lorebook-cover-hint">Click to reposition</span>`
+                : `<div class="lorebook-cover-placeholder">
+                    <span class="ui-icon ui-icon-book" aria-hidden="true"></span>
+                    <strong>No cover yet</strong>
+                    <small>Upload an image to give this lorebook a visual identity.</small>
+                  </div>`
+            }
+          </div>
+
+          <div class="lorebook-cover-controls">
+            <input type="file" id="lorebookCoverInput" accept="image/png,image/jpeg,image/webp" hidden />
+
+            <button class="secondary-button" type="button" id="chooseCoverButton">
+              Choose Cover
+            </button>
+
+            ${
+              cover?.data
+                ? `<button class="secondary-button" type="button" id="repositionCoverButton">Reposition</button>
+                   <button class="secondary-button" type="button" id="removeCoverButton">Remove Cover</button>`
+                : ""
+            }
+
+            <label class="form-field cover-image-type-field">
+              <span>Image Type</span>
+              <select id="coverImageType">
+                <option value="portrait" ${coverShape === "portrait" ? "selected" : ""}>Portrait</option>
+                <option value="square" ${coverShape === "square" ? "selected" : ""}>Square</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div class="editor-section">
         <div class="section-title">
           <span class="ui-icon ui-icon-book" aria-hidden="true"></span>
@@ -95,6 +151,8 @@ export function renderLorebookEditor(lorebook, options = {}) {
 
   renderLorebookEntries();
   wireLorebookEvents();
+  wireCoverEvents();
+  applyCoverPreview();
 }
 
 function ensureEditorMount(mountId = "editorMount") {
@@ -335,4 +393,128 @@ function syncEmbeddedLorebook() {
   if (state.currentCard && state.currentProjectType === "bot-with-lorebook") {
     state.currentCard.data.character_book = state.currentLorebook;
   }
+}
+
+/* ================================
+   Lorebook Cover Image
+   Stored at lorebook.extensions.cover = { data, crop, imageType }.
+   Spec-safe (other tools ignore unknown extensions, and the importer
+   already preserves the extensions object so it round-trips). The shared
+   avatarCropper API works as-is — it takes dataUrl/crop/imageType params
+   directly and does not depend on global state.
+================================ */
+
+function getCover() {
+  return state.currentLorebook?.extensions?.cover || null;
+}
+
+function setCover(next) {
+  if (!state.currentLorebook) return;
+  state.currentLorebook.extensions = state.currentLorebook.extensions || {};
+  if (next) {
+    state.currentLorebook.extensions.cover = next;
+  } else {
+    delete state.currentLorebook.extensions.cover;
+  }
+  syncEmbeddedLorebook();
+  saveDraftQuietly();
+}
+
+function applyCoverPreview() {
+  const cover = getCover();
+  const box = document.getElementById("lorebookCoverPreview");
+  const image = document.getElementById("lorebookCoverImage");
+  if (!cover || !box || !image) return;
+
+  const run = () => applyCropToImage(
+    image,
+    box.clientWidth,
+    box.clientHeight,
+    cover.crop || { x: 0.5, y: 0.5, zoom: 1 },
+    cover.imageType || "portrait"
+  );
+
+  if (image.complete && image.naturalWidth) {
+    run();
+  } else {
+    image.addEventListener("load", run, { once: true });
+  }
+}
+
+async function runCoverCropper() {
+  const cover = getCover();
+  if (!cover?.data) return;
+
+  const result = await openAvatarCropper(
+    cover.data,
+    cover.crop || { x: 0.5, y: 0.5, zoom: 1 },
+    cover.imageType || "portrait"
+  );
+
+  if (result) {
+    setCover({ ...cover, crop: result });
+    applyCoverPreview();
+  }
+}
+
+function wireCoverEvents() {
+  const input = document.getElementById("lorebookCoverInput");
+  const chooseButton = document.getElementById("chooseCoverButton");
+  const repositionButton = document.getElementById("repositionCoverButton");
+  const removeButton = document.getElementById("removeCoverButton");
+  const preview = document.getElementById("lorebookCoverPreview");
+  const imageTypeSelect = document.getElementById("coverImageType");
+
+  chooseButton?.addEventListener("click", () => input.click());
+
+  repositionButton?.addEventListener("click", runCoverCropper);
+
+  if (preview && getCover()?.data) {
+    preview.addEventListener("click", runCoverCropper);
+    preview.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        runCoverCropper();
+      }
+    });
+  }
+
+  removeButton?.addEventListener("click", async () => {
+    const ok = await confirmAction({
+      title: "Remove lorebook cover?",
+      message: "The cover image will be removed from this lorebook.",
+      confirmLabel: "Remove Cover"
+    });
+    if (!ok) return;
+    setCover(null);
+    renderLorebookEditor(state.currentLorebook);
+  });
+
+  imageTypeSelect?.addEventListener("change", () => {
+    const cover = getCover();
+    if (!cover) return;
+    const nextType = imageTypeSelect.value === "square" ? "square" : "portrait";
+    setCover({ ...cover, imageType: nextType });
+    renderLorebookEditor(state.currentLorebook);
+  });
+
+  input?.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const dataUrl = await resizeImageToDataUrl(file, 768);
+      const inferredType = await inferAvatarImageType(dataUrl);
+      setCover({
+        data: dataUrl,
+        crop: { x: 0.5, y: 0.5, zoom: 1 },
+        imageType: inferredType
+      });
+      renderLorebookEditor(state.currentLorebook);
+      // Auto-open the cropper so the user can frame the new cover.
+      runCoverCropper();
+    } catch (error) {
+      console.error("Failed to load lorebook cover:", error);
+    }
+  });
 }
