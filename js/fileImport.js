@@ -381,6 +381,12 @@ function normalizeLorebookEntries(entries) {
 }
 
 export function normalizePreset(json) {
+  // NOTE: do NOT inject defaults for the optional text/format fields here. When a
+  // preset omits e.g. new_chat_prompt or scenario_format, SillyTavern fills in its
+  // own (non-empty) default at runtime. Writing empty strings for them would
+  // override that default with nothing — deleting behaviour the user never touched.
+  // The editor shows all text fields for editing (see renderTextFields) but only
+  // persists the ones the user actually fills in.
   const preset = clone(json || {});
 
   preset.prompts = Array.isArray(preset.prompts) ? preset.prompts : [];

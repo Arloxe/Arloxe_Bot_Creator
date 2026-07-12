@@ -37,7 +37,11 @@ export function loadImage(src) {
 
 export async function inferAvatarImageType(dataUrl) {
   const image = await loadImage(dataUrl);
-  return image.naturalHeight > image.naturalWidth ? "portrait" : "square";
+  const w = image.naturalWidth;
+  const h = image.naturalHeight;
+  if (h > w * 1.15) return "portrait";
+  if (w > h * 1.15) return "landscape";
+  return "square";
 }
 
 export function downloadBlob(blob, filename) {
@@ -150,11 +154,17 @@ export const AVATAR_OUTPUTS = {
     width: 512,
     height: 768,
     aspect: 2 / 3
+  },
+  landscape: {
+    width: 768,
+    height: 512,
+    aspect: 3 / 2
   }
 };
 
 export function getAvatarOutput(type) {
-  return AVATAR_OUTPUTS[type === "portrait" ? "portrait" : "square"];
+  if (type === "portrait" || type === "landscape") return AVATAR_OUTPUTS[type];
+  return AVATAR_OUTPUTS.square;
 }
 
 export function clampCrop01(value) {

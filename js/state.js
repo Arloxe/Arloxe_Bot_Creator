@@ -33,7 +33,8 @@ export function setCurrentAvatar(dataUrl) {
 }
 
 export function setCurrentAvatarImageType(type) {
-  state.currentAvatarImageType = type === "portrait" ? "portrait" : "square";
+  state.currentAvatarImageType =
+    type === "portrait" || type === "landscape" ? type : "square";
 }
 
 export function setCurrentAvatarCrop(crop) {

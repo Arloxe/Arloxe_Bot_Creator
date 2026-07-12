@@ -196,14 +196,20 @@ function renderBooleanFields(preset) {
 }
 
 function renderTextFields(preset) {
+  // Always render every text field so the section has content (an empty section
+  // looked like it "wouldn't open"). Fields absent from the preset show as empty
+  // with a hint; updatePresetField only writes a value when the user edits, so
+  // untouched fields stay out of the preset and keep SillyTavern's own defaults.
   return TEXT_FIELDS
-    .filter(([field]) => field in preset)
-    .map(([field, label]) => `
+    .map(([field, label]) => {
+      const present = field in preset;
+      return `
       <label class="form-field">
         <span>${label}</span>
-        <textarea data-preset-field="${field}" rows="4">${escapeHtml(preset[field])}</textarea>
+        <textarea data-preset-field="${field}" rows="4" placeholder="${present ? "" : "Not set — leave empty to use the app/SillyTavern default"}">${escapeHtml(preset[field] ?? "")}</textarea>
       </label>
-    `)
+    `;
+    })
     .join("");
 }
 
@@ -239,8 +245,15 @@ function wirePresetJumpNav() {
   document.querySelectorAll("[data-preset-jump]").forEach((button) => {
     button.addEventListener("click", () => {
       const target = getPresetJumpTarget(button.dataset.presetJump);
+      if (!target) return;
 
-      target?.scrollIntoView({
+      // If the jump target is (or lives inside) a collapsed <details>, open it
+      // first — otherwise clicking e.g. "Text" just scrolls to a section that
+      // stays closed, so it looks like it "won't open".
+      const collapsible = target.closest?.("details");
+      if (collapsible) collapsible.open = true;
+
+      target.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });

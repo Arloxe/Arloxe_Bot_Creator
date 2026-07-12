@@ -998,6 +998,11 @@ html[data-theme="light"] .workspace-collapse {
   aspect-ratio: 1 / 1;
 }
 
+.lorebook-cover-preview.lorebook-cover-landscape {
+  aspect-ratio: 3 / 2;
+  width: 280px;
+}
+
 .lorebook-cover-preview img {
   position: absolute;
   top: 0;

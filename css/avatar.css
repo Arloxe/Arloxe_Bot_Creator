@@ -27,6 +27,11 @@
   aspect-ratio: 2 / 3;
 }
 
+.avatar-preview.is-landscape {
+  aspect-ratio: 3 / 2;
+  width: 280px;
+}
+
 .avatar-preview img {
   position: absolute;
   top: 0;

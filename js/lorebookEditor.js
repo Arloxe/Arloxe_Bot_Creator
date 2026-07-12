@@ -38,7 +38,10 @@ export function renderLorebookEditor(lorebook, options = {}) {
   const mount = ensureEditorMount(mountId);
 
   const cover = lorebook.extensions?.cover || null;
-  const coverShape = cover?.imageType === "square" ? "square" : "portrait";
+  const coverShape =
+    cover?.imageType === "square" || cover?.imageType === "landscape"
+      ? cover.imageType
+      : "portrait";
 
   mount.innerHTML = `
     <form class="editor-form" id="lorebookEditorForm">
@@ -88,6 +91,7 @@ export function renderLorebookEditor(lorebook, options = {}) {
               <select id="coverImageType">
                 <option value="portrait" ${coverShape === "portrait" ? "selected" : ""}>Portrait</option>
                 <option value="square" ${coverShape === "square" ? "selected" : ""}>Square</option>
+                <option value="landscape" ${coverShape === "landscape" ? "selected" : ""}>Landscape</option>
               </select>
             </label>
           </div>
@@ -493,7 +497,10 @@ function wireCoverEvents() {
   imageTypeSelect?.addEventListener("change", () => {
     const cover = getCover();
     if (!cover) return;
-    const nextType = imageTypeSelect.value === "square" ? "square" : "portrait";
+    const nextType =
+      imageTypeSelect.value === "square" || imageTypeSelect.value === "landscape"
+        ? imageTypeSelect.value
+        : "portrait";
     setCover({ ...cover, imageType: nextType });
     renderLorebookEditor(state.currentLorebook);
   });

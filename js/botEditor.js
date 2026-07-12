@@ -54,7 +54,7 @@ export function renderCardEditor(card, options = {}) {
 
         <div class="avatar-editor">
           <div
-            class="avatar-preview ${state.currentAvatarImageType === "portrait" ? "is-portrait" : ""} ${state.currentAvatarDataUrl ? "is-editable" : ""}"
+            class="avatar-preview ${state.currentAvatarImageType === "portrait" ? "is-portrait" : ""} ${state.currentAvatarImageType === "landscape" ? "is-landscape" : ""} ${state.currentAvatarDataUrl ? "is-editable" : ""}"
             id="avatarPreview"
             ${state.currentAvatarDataUrl ? 'role="button" tabindex="0" aria-label="Reposition avatar crop"' : ""}
           >
@@ -93,8 +93,9 @@ export function renderCardEditor(card, options = {}) {
             <label class="avatar-type-control">
               <span>Image Type</span>
               <select id="avatarImageTypeSelect">
-                <option value="square" ${state.currentAvatarImageType !== "portrait" ? "selected" : ""}>Square</option>
+                <option value="square" ${state.currentAvatarImageType !== "portrait" && state.currentAvatarImageType !== "landscape" ? "selected" : ""}>Square</option>
                 <option value="portrait" ${state.currentAvatarImageType === "portrait" ? "selected" : ""}>Portrait</option>
+                <option value="landscape" ${state.currentAvatarImageType === "landscape" ? "selected" : ""}>Landscape</option>
               </select>
             </label>
 
